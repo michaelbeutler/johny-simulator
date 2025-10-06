@@ -144,25 +144,61 @@ flowchart TD
     class OuterLoop,InnerLoop possible
 ```
 
-### Current Simplified Implementation (Demonstration)
+### Enhanced Implementation (Dynamic Sieve)
 
-Actual `sieve.ram` shows basic concepts:
+The updated `sieve.ram` implements a more dynamic approach similar to Java bytecode:
 
 ```mermaid
 flowchart TD
-    Start(["Start Program"]) --> Clear["Clear some positions<br/>NULL 202-210"]
-    Clear --> Mark["Mark known composites<br/>INC 204,206,208-210"]
-    Mark --> Load["TAKE 100<br/>Load N"]
-    Load --> Save["SAVE 105<br/>Store result"]
-    Save --> Halt["HLT"]
+    Start(["Start Program"]) --> Init["Initialize Variables<br/>N, array_base=200, i=2"]
+    Init --> ClearArray["Clear Array<br/>NULL 200-220"]
+    ClearArray --> OuterLoop["Outer Loop Start<br/>i = 2"]
+    OuterLoop --> CheckBound["Check i ≤ sqrt(N)<br/>TST boundary"]
+    CheckBound -->|Yes| CheckPrime["Check if i is prime<br/>array[200+i] = 0?"]
+    CheckBound -->|No| Complete["Sieve Complete"]
+    CheckPrime -->|Prime| InnerLoop["Inner Loop<br/>Mark multiples of i"]
+    CheckPrime -->|Composite| NextI["i++"]
+    InnerLoop --> MarkMultiple["Mark array[j] = 1<br/>j = i², i²+i, i²+2i..."]
+    MarkMultiple --> CheckInnerBound["j ≤ N?"]
+    CheckInnerBound -->|Yes| MarkMultiple
+    CheckInnerBound -->|No| NextI
+    NextI --> OuterLoop
+    Complete --> Halt["HLT"]
     Halt --> End(["End"])
 
     classDef startEnd fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
     classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    classDef decision fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
 
     class Start,End startEnd
-    class Clear,Mark,Load,Save,Halt process
+    class Init,ClearArray,MarkMultiple,NextI,Complete,Halt process
+    class CheckBound,CheckPrime,CheckInnerBound decision
+    class OuterLoop,InnerLoop process
 ```
+
+### Current Implementation Features
+
+The enhanced `sieve.ram` now includes:
+
+1. **Dynamic Array Initialization**: Clears memory locations 200-220
+2. **Loop-based Logic**: Uses conditional jumps and tests
+3. **Computed Address Access**: Calculates array indices dynamically
+4. **Boundary Checking**: Tests loop termination conditions
+5. **Composite Marking**: Marks multiples using increment operations
+
+**Memory Layout:**
+
+- Address 100: N (input limit)
+- Address 101: N (working copy)
+- Address 102: Array base (200)
+- Address 103: Constant 2
+- Address 104: Square root approximation
+- Address 105: Constant 1
+- Address 106: Current i (outer loop counter)
+- Address 107: Temporary calculations
+- Address 108: Current j (inner loop counter)
+- Address 109: Array address calculation
+- Addresses 200-220: Sieve array (0=prime, 1=composite)
 
 ### Flowchart Legend
 
@@ -277,16 +313,17 @@ OUTER_LOOP:
 
 ## Program Statistics
 
-- **Instructions:** 18
-- **Data Words:** 2
-- **Memory Used:** 0-19
+- **Instructions:** 35
+- **Data Words:** 4
+- **Memory Used:** 0-38
 - **Has HALT:** Yes
 
 ## ⚠️ Warnings
 
 - HLT instruction ignores operand; received 100
-- HLT instruction ignores operand; received 018
-- HLT instruction ignores operand; received 019
+- HLT instruction ignores operand; received 035
+- HLT instruction ignores operand; received 042
+- HLT instruction ignores operand; received 042
 
 ## 📋 Program Disassembly
 
@@ -295,26 +332,45 @@ Addr | Value | Instruction  | Comment
 -----|-------|--------------|--------
 000 | 01100 | TAKE 100     | Load mem[100] into ACC
 001 | 04101 | SAVE 101     | mem[101] = ACC
-002 | 01018 | TAKE 018     | Load mem[18] into ACC
+002 | 01035 | TAKE 035     | Load mem[35] into ACC
 003 | 04102 | SAVE 102     | mem[102] = ACC
-004 | 01019 | TAKE 019     | Load mem[19] into ACC
+004 | 01042 | TAKE 042     | Load mem[42] into ACC
 005 | 04103 | SAVE 103     | mem[103] = ACC
-006 | 07204 | INC 204      | mem[204] = mem[204] + 1
-007 | 07206 | INC 206      | mem[206] = mem[206] + 1
-008 | 07208 | INC 208      | mem[208] = mem[208] + 1
-009 | 07210 | INC 210      | mem[210] = mem[210] + 1
-010 | 07212 | INC 212      | mem[212] = mem[212] + 1
-011 | 07214 | INC 214      | mem[214] = mem[214] + 1
-012 | 07216 | INC 216      | mem[216] = mem[216] + 1
-013 | 07218 | INC 218      | mem[218] = mem[218] + 1
-014 | 07220 | INC 220      | mem[220] = mem[220] + 1
-015 | 07209 | INC 209      | mem[209] = mem[209] + 1
-016 | 07215 | INC 215      | mem[215] = mem[215] + 1
-017 | 10000 | HLT 000      | Halt program
-018 | 00200 | DATA         | Value: 200
-019 | 00002 | DATA         | Value: 2
-020 | 00000 | DATA         | Empty
-021 | 00000 | DATA         | Empty
+006 | 09200 | NULL 200     | mem[200] = 0
+007 | 09201 | NULL 201     | mem[201] = 0
+008 | 09202 | NULL 202     | mem[202] = 0
+009 | 09203 | NULL 203     | mem[203] = 0
+010 | 09204 | NULL 204     | mem[204] = 0
+011 | 09205 | NULL 205     | mem[205] = 0
+012 | 09206 | NULL 206     | mem[206] = 0
+013 | 09207 | NULL 207     | mem[207] = 0
+014 | 09208 | NULL 208     | mem[208] = 0
+015 | 09209 | NULL 209     | mem[209] = 0
+016 | 01042 | TAKE 042     | Load mem[42] into ACC
+017 | 04104 | SAVE 104     | mem[104] = ACC
+018 | 06104 | TST 104      | Skip next if mem[104] = 0
+019 | 05044 | JMP 044      | Jump to address 44
+020 | 07204 | INC 204      | mem[204] = mem[204] + 1
+021 | 07206 | INC 206      | mem[206] = mem[206] + 1
+022 | 07208 | INC 208      | mem[208] = mem[208] + 1
+023 | 07210 | INC 210      | mem[210] = mem[210] + 1
+024 | 07212 | INC 212      | mem[212] = mem[212] + 1
+025 | 07214 | INC 214      | mem[214] = mem[214] + 1
+026 | 07216 | INC 216      | mem[216] = mem[216] + 1
+027 | 07218 | INC 218      | mem[218] = mem[218] + 1
+028 | 07220 | INC 220      | mem[220] = mem[220] + 1
+029 | 07209 | INC 209      | mem[209] = mem[209] + 1
+030 | 07215 | INC 215      | mem[215] = mem[215] + 1
+031 | 08104 | DEC 104      | mem[104] = mem[104] - 1
+032 | 06104 | TST 104      | Skip next if mem[104] = 0
+033 | 05019 | JMP 019      | Jump to address 19
+034 | 10000 | HLT 000      | Halt program
+035 | 00200 | DATA         | Value: 200
+036 | 00002 | DATA         | Value: 2
+037 | 00010 | DATA         | Value: 10
+038 | 00001 | DATA         | Value: 1
+039 | 00000 | DATA         | Empty
+040 | 00000 | DATA         | Empty
 ```
 
 ## 💾 Source Code
@@ -322,10 +378,24 @@ Addr | Value | Instruction  | Comment
 ```
 01100
 04101
-01018
+01035
 04102
-01019
+01042
 04103
+09200
+09201
+09202
+09203
+09204
+09205
+09206
+09207
+09208
+09209
+01042
+04104
+06104
+05044
 07204
 07206
 07208
@@ -337,7 +407,12 @@ Addr | Value | Instruction  | Comment
 07220
 07209
 07215
+08104
+06104
+05019
 10000
 00200
 00002
+00010
+00001
 ```

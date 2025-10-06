@@ -68,35 +68,129 @@ After execution:
 ## 🧪 Test Cases
 
 - ✅ should validate countdown program
-- ✅ should countdown from 5 to 0
-- ✅ should countdown from 10 to 0
-- ✅ should handle zero initial value
+- ✅ should execute without errors
+- ✅ should countdown from 10 to 0 and store all values
+- ✅ should store countdown sequence correctly
 
 ## Program Statistics
 
-- **Instructions:** 4
+- **Instructions:** 44
 - **Data Words:** 0
-- **Memory Used:** 0-3
+- **Memory Used:** 0-43
 - **Has HALT:** Yes
+
+## ⚠️ Warnings
+
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 100
 
 ## 📋 Program Disassembly
 
 ```
 Addr | Value | Instruction  | Comment
 -----|-------|--------------|--------
-000 | 08100 | DEC 100      | mem[100] = mem[100] - 1
-001 | 06100 | TST 100      | Skip next if mem[100] = 0
-002 | 05000 | JMP 000      | Jump to address 0
-003 | 10000 | HLT 000      | Halt program
-004 | 00000 | DATA         | Empty
-005 | 00000 | DATA         | Empty
+000 | 09100 | NULL 100     | mem[100] = 0
+001 | 07100 | INC 100      | mem[100] = mem[100] + 1
+002 | 07100 | INC 100      | mem[100] = mem[100] + 1
+003 | 07100 | INC 100      | mem[100] = mem[100] + 1
+004 | 07100 | INC 100      | mem[100] = mem[100] + 1
+005 | 07100 | INC 100      | mem[100] = mem[100] + 1
+006 | 07100 | INC 100      | mem[100] = mem[100] + 1
+007 | 07100 | INC 100      | mem[100] = mem[100] + 1
+008 | 07100 | INC 100      | mem[100] = mem[100] + 1
+009 | 07100 | INC 100      | mem[100] = mem[100] + 1
+010 | 07100 | INC 100      | mem[100] = mem[100] + 1
+011 | 01100 | TAKE 100     | Load mem[100] into ACC
+012 | 04050 | SAVE 050     | mem[50] = ACC
+013 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+014 | 01100 | TAKE 100     | Load mem[100] into ACC
+015 | 04051 | SAVE 051     | mem[51] = ACC
+016 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+017 | 01100 | TAKE 100     | Load mem[100] into ACC
+018 | 04052 | SAVE 052     | mem[52] = ACC
+019 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+020 | 01100 | TAKE 100     | Load mem[100] into ACC
+021 | 04053 | SAVE 053     | mem[53] = ACC
+022 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+023 | 01100 | TAKE 100     | Load mem[100] into ACC
+024 | 04054 | SAVE 054     | mem[54] = ACC
+025 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+026 | 01100 | TAKE 100     | Load mem[100] into ACC
+027 | 04055 | SAVE 055     | mem[55] = ACC
+028 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+029 | 01100 | TAKE 100     | Load mem[100] into ACC
+030 | 04056 | SAVE 056     | mem[56] = ACC
+031 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+032 | 01100 | TAKE 100     | Load mem[100] into ACC
+033 | 04057 | SAVE 057     | mem[57] = ACC
+034 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+035 | 01100 | TAKE 100     | Load mem[100] into ACC
+036 | 04058 | SAVE 058     | mem[58] = ACC
+037 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+038 | 01100 | TAKE 100     | Load mem[100] into ACC
+039 | 04059 | SAVE 059     | mem[59] = ACC
+040 | 08100 | DEC 100      | mem[100] = mem[100] - 1
+041 | 01100 | TAKE 100     | Load mem[100] into ACC
+042 | 04060 | SAVE 060     | mem[60] = ACC
+043 | 10000 | HLT 000      | Halt program
+044 | 00000 | DATA         | Empty
+045 | 00000 | DATA         | Empty
 ```
 
 ## 💾 Source Code
 
 ```
+09100
+07100
+07100
+07100
+07100
+07100
+07100
+07100
+07100
+07100
+07100
+01100
+04050
 08100
-06100
-05000
+01100
+04051
+08100
+01100
+04052
+08100
+01100
+04053
+08100
+01100
+04054
+08100
+01100
+04055
+08100
+01100
+04056
+08100
+01100
+04057
+08100
+01100
+04058
+08100
+01100
+04059
+08100
+01100
+04060
 10000
 ```

@@ -1,85 +1,78 @@
-# Integer Division (IDIV) Program
+# IDIV Program
 
-This program implements integer division using repeated subtraction, returning both quotient and remainder.
+<!-- AUTO_GENERATED_DOCS_START -->
+<!-- Everything below this line will be replaced by auto-generated documentation -->
 
-## How to Use
+**Status:** ✅ VALID
 
-### Browser Simulator
+**Tests:** ✅ 11/11 passed
 
-1. Load `idiv.ram` into the browser simulator
-2. Set input values:
-   - `memory[0] = dividend` (number to be divided)
-   - `memory[1] = divisor` (number to divide by)
-3. Run the program
-4. Results will be stored at:
-   - `memory[2] = quotient` (whole number result)
-   - `memory[3] = remainder` (leftover amount)
+## 🧪 Test Cases
 
-### TypeScript Simulator
+- ✅ should validate IDIV program
+- ✅ should divide 15 by 3 = 5 remainder 0
+- ✅ should divide 17 by 5 = 3 remainder 2
+- ✅ should divide 7 by 10 = 0 remainder 7
+- ✅ should divide 20 by 1 = 20 remainder 0
+- ✅ should divide 0 by 5 = 0 remainder 0
+- ✅ should handle division by 1
+- ✅ should handle perfect division
+- ✅ should handle large remainder
+- ✅ should handle same dividend and divisor
+- ✅ should handle single digit operations
 
-```bash
-npm test # Includes IDIV tests for various division scenarios
+## Program Statistics
+
+- **Instructions:** 14
+- **Data Words:** 0
+- **Memory Used:** 0-13
+- **Has HALT:** Yes
+
+## ⚠️ Warnings
+
+- HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 103
+- HLT instruction ignores operand; received 103
+
+## 📋 Program Disassembly
+
+```
+Addr | Value | Instruction  | Comment
+-----|-------|--------------|--------
+000 | 09102 | NULL 102     | mem[102] = 0
+001 | 01100 | TAKE 100     | Load mem[100] into ACC
+002 | 04103 | SAVE 103     | mem[103] = ACC
+003 | 01103 | TAKE 103     | Load mem[103] into ACC
+004 | 03101 | SUB 101      | ACC = ACC - mem[101]
+005 | 04104 | SAVE 104     | mem[104] = ACC
+006 | 06104 | TST 104      | Skip next if mem[104] = 0
+007 | 05012 | JMP 012      | Jump to address 12
+008 | 01103 | TAKE 103     | Load mem[103] into ACC
+009 | 03101 | SUB 101      | ACC = ACC - mem[101]
+010 | 04103 | SAVE 103     | mem[103] = ACC
+011 | 07102 | INC 102      | mem[102] = mem[102] + 1
+012 | 05003 | JMP 003      | Jump to address 3
+013 | 10000 | HLT 000      | Halt program
+014 | 00000 | DATA         | Empty
+015 | 00000 | DATA         | Empty
 ```
 
-## Algorithm
+## 💾 Source Code
 
-The program implements the mathematical relationship: **z : n = q Rest r**
-
-Where: **q × n + r = z**
-
-- z = dividend (input at address 100)
-- n = divisor (input at address 101)
-- q = quotient (output at address 102)
-- r = remainder (output at address 103)
-
-### Steps:
-
-1. Initialize quotient to 0
-2. Copy dividend to remainder
-3. Repeatedly subtract divisor from remainder
-4. Increment quotient for each successful subtraction
-5. Stop when remainder becomes less than divisor
-6. Final remainder is the division remainder
-
-## Memory Layout
-
-- **Address 0**: Input dividend (z)
-- **Address 1**: Input divisor (n)
-- **Address 2**: Output quotient (q)
-- **Address 3**: Output remainder (r)
-- **Address 4**: Temporary storage
-
-## Examples
-
-### Example 1: 17 ÷ 5
-
-- Input: dividend=17, divisor=5
-- Output: quotient=3, remainder=2
-- Verification: 3 × 5 + 2 = 17 ✓
-
-### Example 2: 15 ÷ 3
-
-- Input: dividend=15, divisor=3
-- Output: quotient=5, remainder=0
-- Verification: 5 × 3 + 0 = 15 ✓
-
-### Example 3: 7 ÷ 10
-
-- Input: dividend=7, divisor=10
-- Output: quotient=0, remainder=7
-- Verification: 0 × 10 + 7 = 7 ✓
-
-## Use Cases
-
-- Integer arithmetic operations
-- Modular arithmetic calculations
-- Resource distribution problems
-- Mathematical computations requiring both quotient and remainder
-- Educational demonstrations of division algorithms
-
-## Implementation Notes
-
-- Uses repeated subtraction method
-- Handles edge cases like dividend < divisor
-- Leverages JOHNNY's underflow protection (negative results become 0)
-- Works with any positive integer inputs within JOHNNY's range
+```
+09102
+01100
+04103
+01103
+03101
+04104
+06104
+05012
+01103
+03101
+04103
+07102
+05003
+10000
+00000
+```
