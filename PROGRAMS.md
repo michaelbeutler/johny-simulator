@@ -6,13 +6,13 @@
 
 - **Total Programs:** 4
 - **Valid Programs:** 4/4
-- **Total Instructions:** 36
+- **Total Instructions:** 35
 
 ## 📁 Programs
 
 | Program | Status | Instructions | Tests | Description |
 |---------|--------|--------------|-------|-------------|
-| [sieve](scripts/sieve.md) | ✅ | 18 | 4/4 | *Auto-generated* |
+| [sieve](scripts/sieve.md) | ✅ | 17 | 4/4 | *Auto-generated* |
 | [addition](scripts/addition.md) | ✅ | 4 | 5/5 | *Auto-generated* |
 | [countdown](scripts/countdown.md) | ✅ | 4 | 4/4 | *Auto-generated* |
 | [multiply](scripts/multiply.md) | ✅ | 10 | 5/5 | *Auto-generated* |

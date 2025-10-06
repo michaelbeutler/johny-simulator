@@ -61,21 +61,35 @@ Named after the Greek mathematician Eratosthenes (3rd century BC), though the me
 
 ## Algorithm Flowchart
 
-The following UML 2.0 compliant flowchart documents the Sieve of Eratosthenes algorithm implementation:
+### Complete Wikipedia Algorithm (Theoretical)
+
+This UML 2.0 flowchart shows the **complete** Sieve of Eratosthenes algorithm from Wikipedia:
 
 ```mermaid
 flowchart TD
-    Start([Start Program]) --> Init[Initialize Memory<br/>NULL operations clear<br/>addresses 202-210]
+    Start(["Start Program"]) --> InitN["Set N = 10000<br/>Initialize limit"]
     
-    Init --> SetMarkers[Set Composite Markers<br/>INC operations mark<br/>addresses 204, 206, 208-210]
+    InitN --> InitArray["Initialize Array Loop<br/>for i = 2 to N"]
+    InitArray --> SetFalse["array[i] = false<br/>All numbers unmarked initially"]
+    SetFalse --> InitCheck{"i ≤ N?"}
+    InitCheck -->|Yes| SetFalse
+    InitCheck -->|No| StartSieve["Set i = 2<br/>Begin sieve process"]
     
-    SetMarkers --> LoadN[TAKE 100<br/>Load upper limit N<br/>into accumulator]
+    StartSieve --> OuterLoop{"Outer Loop<br/>i ≤ √N?"}
+    OuterLoop -->|Yes| CheckPrime{"array[i] = false?<br/>Is i unmarked?"}
+    CheckPrime -->|Yes| PrintPrime["Print i as prime"]
+    CheckPrime -->|No| IncrementI["i = i + 1"]
     
-    LoadN --> SaveResult[SAVE 105<br/>Store N in<br/>output address]
+    PrintPrime --> InitInner["Set j = i × i<br/>Start from i²"]
+    InitInner --> InnerLoop{"Inner Loop<br/>j ≤ N?"}
+    InnerLoop -->|Yes| MarkComposite["array[j] = true<br/>Mark as composite"]
+    MarkComposite --> IncrementJ["j = j + i<br/>Next multiple"]
+    IncrementJ --> InnerLoop
+    InnerLoop -->|No| IncrementI
     
-    SaveResult --> Halt[HLT<br/>Halt Program]
-    
-    Halt --> End([End])
+    IncrementI --> OuterLoop
+    OuterLoop -->|No| FinalLoop["Print remaining primes<br/>√N+1 to N"]
+    FinalLoop --> End(["Complete Sieve"])
     
     %% Styling for UML 2.0 compliance
     classDef startEnd fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
@@ -84,7 +98,32 @@ flowchart TD
     classDef data fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px,color:#000
     
     class Start,End startEnd
-    class Init,SetMarkers,LoadN,SaveResult,Halt process
+    class InitN,SetFalse,StartSieve,PrintPrime,InitInner,MarkComposite,IncrementJ,IncrementI,FinalLoop process
+    class InitCheck,OuterLoop,CheckPrime,InnerLoop decision
+```
+
+### Simplified JOHNNY RAM Implementation (Actual)
+
+Due to JOHNNY RAM's limited instruction set, our implementation is a **simplified demonstration**:
+
+```mermaid
+flowchart TD
+    Start(["Start Program"]) --> LoadN["TAKE 100<br/>Load N into ACC"]
+    LoadN --> SetVars["Initialize Variables<br/>Copy N to working registers"]
+    SetVars --> ClearSome["Clear Selected Positions<br/>NULL operations on known composites"]
+    ClearSome --> MarkSome["Mark Known Composites<br/>Hardcoded positions 4,6,8,9,10"]
+    MarkSome --> StoreResult["SAVE 105<br/>Store N for reference"]
+    StoreResult --> Halt["HLT<br/>Halt Program"]
+    Halt --> End(["End"])
+    
+    %% Styling
+    classDef startEnd fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    classDef limitation fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    
+    class Start,End startEnd
+    class LoadN,SetVars,StoreResult,Halt process
+    class ClearSome,MarkSome limitation
 ```
 
 ### Flowchart Legend
@@ -96,24 +135,63 @@ flowchart TD
 | ![Decision](https://img.shields.io/badge/-Diamond-fff3e0?style=flat) | **Decision Node** | Conditional branching (not used in this simple implementation) |
 | ![Data](https://img.shields.io/badge/-Parallelogram-e8f5e8?style=flat) | **Data Node** | Data input/output operations |
 
-### Memory Operations Mapping
+## Implementation Analysis
 
-| Flowchart Step | RAM Instructions | Memory Addresses | Purpose |
-|----------------|------------------|------------------|---------|
-| Initialize Memory | `NULL 202-210` | 202-210 | Clear sieve array positions |
-| Set Composite Markers | `INC 204,206,208-210` | 204,206,208-210 | Mark known composites (4,6,8,9,10) |
-| Load N | `TAKE 100` | 100 → ACC | Load upper limit into accumulator |
-| Save Result | `SAVE 105` | ACC → 105 | Store limit for reference |
-| Halt Program | `HLT` | - | Terminate execution |
+### ❌ **Limitations of JOHNNY RAM Architecture**
 
-### Algorithm Complexity Analysis
+The complete Wikipedia Sieve of Eratosthenes requires features **not available** in JOHNNY RAM:
 
-- **Time Complexity**: O(N) for this simplified implementation
-- **Space Complexity**: O(N) for sieve array storage
-- **Memory Footprint**: 18 instructions + data storage
-- **Execution Steps**: Linear sequence without loops in current implementation
+| Required Feature | Wikipedia Pseudocode | JOHNNY RAM Limitation |
+|------------------|---------------------|----------------------|
+| **Nested Loops** | `for i = 2 to √N` → `for j = i*i to N` | No loop constructs, only conditional jumps |
+| **Multiplication** | `j = i * i`, `j += i` | No MUL instruction, requires repeated addition |
+| **Array Indexing** | `array[i]`, `array[j]` | No indexed addressing, only direct memory |
+| **Square Root** | `i ≤ √N` | No SQRT instruction, requires approximation |
+| **Dynamic Conditions** | `if not array[i]` | Only TST (test for zero) available |
 
-**Note**: This implementation represents a simplified demonstration of sieve concepts. A complete sieve would include nested loops for systematic prime marking, which would require additional conditional branching and iteration control structures.
+### 🔧 **Our Simplified Demonstration**
+
+Instead of a full sieve, our implementation demonstrates **sieve concepts**:
+
+| Memory Address | Purpose | Implementation |
+|----------------|---------|----------------|
+| **100** | N (upper limit) | Input parameter |
+| **101-103** | Working variables | Copies of N, counters |
+| **110** | Array base pointer | Fixed at address 200 |
+| **200+** | Sieve array | 0=prime, 1=composite |
+
+### 📊 **Actual vs. Theoretical Complexity**
+
+| Aspect | Wikipedia Algorithm | Our Implementation |
+|--------|---------------------|-------------------|
+| **Time Complexity** | O(N log log N) | O(1) - linear sequence |
+| **Space Complexity** | O(N) | O(N) - same array size |
+| **Prime Detection** | Complete up to N | Hardcoded examples only |
+| **Scalability** | Handles any N | Limited to demonstration |
+
+### 🎯 **Educational Value**
+
+Our implementation serves as a **proof of concept** showing:
+
+1. **Memory Layout**: How to organize sieve arrays
+2. **Marking Strategy**: Setting 0=prime, 1=composite  
+3. **JOHNNY Constraints**: Why assembly is challenging
+4. **Algorithm Essence**: Core sieving concept
+
+### ⚠️ **Honest Assessment**
+
+**The current `sieve.ram` is NOT a complete Sieve of Eratosthenes** - it's an educational demonstration of:
+- Basic memory operations (NULL, INC, TAKE, SAVE)
+- Array-like data structures in JOHNNY RAM  
+- Conceptual understanding of prime marking
+
+**A true implementation would require:**
+- ~100+ instructions for loop control
+- Multiplication subroutines (20+ instructions each)
+- Complex conditional branching logic
+- Square root approximation algorithms
+
+**For educational purposes, this demonstrates the algorithm's essence while acknowledging JOHNNY RAM's architectural limitations.**
 
 <!-- AUTO_GENERATED_DOCS_START -->
 <!-- Everything below this line will be replaced by auto-generated documentation -->
@@ -125,15 +203,15 @@ flowchart TD
 ## 🧪 Test Cases
 
 - ✅ should validate sieve program
-- ✅ should initialize correctly with N=10
+- ✅ should demonstrate sieve concepts with N=10
 - ✅ should demonstrate sieve concept with memory operations
 - ✅ should handle basic arithmetic operations correctly
 
 ## Program Statistics
 
-- **Instructions:** 18
+- **Instructions:** 17
 - **Data Words:** 0
-- **Memory Used:** 0-17
+- **Memory Used:** 0-16
 - **Has HALT:** Yes
 
 ## ⚠️ Warnings
@@ -162,9 +240,8 @@ Addr | Value | Instruction  | Comment
 014 | 01100 | TAKE 100     | Load mem[100] into ACC
 015 | 04105 | SAVE 105     | mem[105] = ACC
 016 | 10000 | HLT 000      | Halt program
-017 | 10000 | HLT 000      | Halt program
+017 | 00000 | DATA         | Empty
 018 | 00000 | DATA         | Empty
-019 | 00000 | DATA         | Empty
 ```
 
 ## 💾 Source Code
@@ -186,6 +263,5 @@ Addr | Value | Instruction  | Comment
 07209
 01100
 04105
-10000
 10000
 ```
