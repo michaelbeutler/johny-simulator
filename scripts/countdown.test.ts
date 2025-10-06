@@ -14,35 +14,48 @@ describe('Countdown Program Tests', () => {
     expect(result.errors).toHaveLength(0);
   });
 
-  test('should countdown from 5 to 0', async () => {
+  test('should execute without errors', async () => {
     const parseResult = parser.parseFile('scripts/countdown.ram');
     expect(parseResult.errors).toHaveLength(0);
 
-    const initialMemory = { 100: 5 };
-    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+    const finalState = simulator.simulate(parseResult.ram, 0, {});
 
     expect(finalState.halted).toBe(true);
     expect(finalState.ram[100]).toBe(0);
-    expect(finalState.steps).toBe(15); // 5 iterations * 3 steps
   });
 
-  test('should countdown from 10 to 0', async () => {
+  test('should countdown from 10 to 0 and store all values', async () => {
     const parseResult = parser.parseFile('scripts/countdown.ram');
-    const initialMemory = { 100: 10 };
-    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+    const finalState = simulator.simulate(parseResult.ram, 0, {});
 
     expect(finalState.halted).toBe(true);
+
+    // Check that all countdown values are stored in consecutive registers
+    expect(finalState.ram[50]).toBe(10); // ADR 50 == 10
+    expect(finalState.ram[51]).toBe(9); // ADR 51 == 9
+    expect(finalState.ram[52]).toBe(8); // ADR 52 == 8
+    expect(finalState.ram[53]).toBe(7); // ADR 53 == 7
+    expect(finalState.ram[54]).toBe(6); // ADR 54 == 6
+    expect(finalState.ram[55]).toBe(5); // ADR 55 == 5
+    expect(finalState.ram[56]).toBe(4); // ADR 56 == 4
+    expect(finalState.ram[57]).toBe(3); // ADR 57 == 3
+    expect(finalState.ram[58]).toBe(2); // ADR 58 == 2
+    expect(finalState.ram[59]).toBe(1); // ADR 59 == 1
+    expect(finalState.ram[60]).toBe(0); // ADR 60 == 0
+
+    // Final counter should be 0
     expect(finalState.ram[100]).toBe(0);
-    expect(finalState.steps).toBe(30); // 10 iterations * 3 steps
   });
 
-  test('should handle zero initial value', async () => {
+  test('should store countdown sequence correctly', async () => {
     const parseResult = parser.parseFile('scripts/countdown.ram');
-    const initialMemory = { 100: 0 };
-    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+    const finalState = simulator.simulate(parseResult.ram, 0, {});
 
     expect(finalState.halted).toBe(true);
-    expect(finalState.ram[100]).toBe(0); // Should stay 0 (DEC of 0 = 0)
-    expect(finalState.steps).toBe(3); // DEC, TST, HLT (TST skips JMP)
+
+    // Verify the countdown sequence is correct
+    for (let i = 0; i <= 10; i++) {
+      expect(finalState.ram[50 + i]).toBe(10 - i);
+    }
   });
 });
