@@ -27,6 +27,21 @@ describe('Addition Program Tests', () => {
     expect(finalState.acc).toBe(40);
   });
 
+  test('should add using embedded data (15 + 25 = 40)', async () => {
+    const parseResult = parser.parseFile('scripts/addition.ram');
+    expect(parseResult.errors).toHaveLength(0);
+
+    // Test that data is embedded in the RAM file itself (no initialMemory needed)
+    expect(parseResult.ram[100]).toBe(15);
+    expect(parseResult.ram[101]).toBe(25);
+
+    const finalState = simulator.simulate(parseResult.ram, 0); // No initial memory override
+
+    expect(finalState.halted).toBe(true);
+    expect(finalState.ram[102]).toBe(40);
+    expect(finalState.acc).toBe(40);
+  });
+
   test('should add negative simulation (0 - bounded)', async () => {
     const parseResult = parser.parseFile('scripts/addition.ram');
     const initialMemory = { 100: 0, 101: 100 };

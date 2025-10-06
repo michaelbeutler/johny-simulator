@@ -51,10 +51,9 @@ export class RamValidator {
       const value = ram[addr];
       if (value === 0) continue; // Skip empty memory
 
-      // Parse 5-digit instruction: OOAAA
-      const instructionStr = value.toString().padStart(5, '0');
-      const opcode = parseInt(instructionStr.slice(0, 2), 10);
-      const operand = parseInt(instructionStr.slice(2), 10);
+      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
+      const opcode = Math.floor(value / 1000) * 10;
+      const operand = value % 1000;
 
       // Validate value range
       if (value < 0 || value > JOHNNY_CONFIG.MAX_VALUE) {
@@ -82,7 +81,7 @@ export class RamValidator {
       }
 
       // Validate operands based on instruction type
-      this.validateOperand(opcode, operand, addr, errors, warnings);
+      this.validateOperand(opcode, operand, addr, value, errors, warnings);
 
       // Check for potential logic issues
       this.checkLogicIssues(opcode, operand, addr, ram, warnings);
@@ -102,19 +101,19 @@ export class RamValidator {
   /**
    * Validate instruction operand
    */
-  private validateOperand(opcode: number, operand: number, address: number, errors: ValidationError[], warnings: ValidationWarning[]): void {
+  private validateOperand(opcode: number, operand: number, address: number, instruction: number, errors: ValidationError[], warnings: ValidationWarning[]): void {
     const opcodeInfo = this.opcodeMapping[opcode];
     
     if (!opcodeInfo) return;
 
-    // Instructions 01-09 require valid address operands (000-999)
-    if (opcode >= 1 && opcode <= 9) {
+    // Instructions 10-90 require valid address operands (000-999)
+    if (opcode >= 10 && opcode <= 90) {
       if (operand < 0 || operand >= JOHNNY_CONFIG.MEMORY_SIZE) {
         errors.push({
           type: 'SYNTAX',
           address: address,
           message: `Invalid address operand ${operand.toString().padStart(3, '0')} for ${opcodeInfo.name}`,
-          instruction: parseInt(`${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`)
+          instruction: instruction
         });
       }
     }

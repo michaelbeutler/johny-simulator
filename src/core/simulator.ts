@@ -61,9 +61,10 @@ export class JohnnySimulator {
     }
 
     const instruction = state.ram[state.pc];
-    const instructionStr = instruction.toString().padStart(5, '0');
-    const opcode = parseInt(instructionStr.slice(0, 2), 10);  // 2-digit opcode
-    const operand = parseInt(instructionStr.slice(2), 10);   // 3-digit operand
+    // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
+    const opcode = Math.floor((instruction || 0) / 1000) * 10;
+    // Extract operand: last 3 digits
+    const operand = (instruction || 0) % 1000;
 
     // Validate instruction if enabled
     if (this.config.validateInstructions && opcode > 0 && !this.opcodeMapping[opcode]) {
@@ -120,7 +121,7 @@ export class JohnnySimulator {
       }
 
       // Increment PC (unless instruction already modified it, like JMP)
-      if (opcode !== 5) { // JMP handles PC itself
+      if (opcode !== 50) { // JMP handles PC itself
         state.pc++;
       }
     } else {

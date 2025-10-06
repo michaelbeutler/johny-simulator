@@ -1,7 +1,8 @@
-// Simple addition program: Add two numbers
-// Number A at address 100, Number B at address 101, Result at address 102
-
 01100  // TAKE 100   - Load first number into ACC
 02101  // ADD 101    - Add second number
 04102  // SAVE 102   - Save result
 10000  // HLT        - Halt
+
+// Data section - Initialize test values
+@100:00015  // First number: 15
+@101:00025  // Second number: 25

@@ -50,7 +50,15 @@ export class RamParser {
       return { value: null, address: -1 };
     }
 
-    // Extract the first integer from the line
+    // Check for explicit address syntax: @address:value
+    const addressMatch = commentStripped.match(/^\s*@(\d+):(\d+)/);
+    if (addressMatch) {
+      const address = parseInt(addressMatch[1], 10);
+      const value = parseInt(addressMatch[2], 10);
+      return { value, address };
+    }
+
+    // Extract the first integer from the line (sequential addressing)
     const match = commentStripped.match(/^\s*(\d+)/);
     if (!match) {
       return { value: null, address: -1 };
@@ -58,8 +66,7 @@ export class RamParser {
 
     const value = parseInt(match[1], 10);
     
-    // For now, use sequential addressing (line number = address)
-    // Could be enhanced to support explicit addressing like "100: 01234"
+    // Use sequential addressing (line number = address)
     return { value, address: -1 }; // -1 means use line index
   }
 
@@ -94,14 +101,13 @@ export class RamParser {
    * Validate instruction format and operand constraints
    */
   private validateInstructionFormat(value: number, address: number, lineNumber: number): void {
-    // Ensure 5-digit format: OOAAA
-    const instruction = value.toString().padStart(5, '0');
-    const opcode = parseInt(instruction.slice(0, 2), 10);  // First 2 digits
-    const operand = parseInt(instruction.slice(2), 10);   // Last 3 digits
+    // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
+    const opcode = Math.floor(value / 1000) * 10;
+    const operand = value % 1000;   // Last 3 digits
 
-    // Validate opcode range (00-10)
-    if (opcode < 0 || opcode > 10) {
-      this.errors.push(`Line ${lineNumber}: Invalid opcode ${opcode.toString().padStart(2, '0')} at address ${address}`);
+    // Validate opcode range (0, 10, 20, ..., 100)
+    if (opcode < 0 || opcode > 100 || opcode % 10 !== 0) {
+      this.errors.push(`Line ${lineNumber}: Invalid opcode ${opcode} at address ${address}`);
       return;
     }
 
@@ -113,15 +119,15 @@ export class RamParser {
    * Validate operand based on opcode requirements
    */
   private validateOperand(opcode: number, operand: number, address: number, lineNumber: number): void {
-    // Instructions 01-09 require valid address operands (000-999)
-    if (opcode >= 1 && opcode <= 9) {
+    // Instructions 10-90 require valid address operands (000-999)
+    if (opcode >= 10 && opcode <= 90) {
       if (operand < 0 || operand >= JOHNNY_CONFIG.MEMORY_SIZE) {
-        this.errors.push(`Line ${lineNumber}: Invalid address operand ${operand.toString().padStart(3, '0')} for opcode ${opcode.toString().padStart(2, '0')} at address ${address}`);
+        this.errors.push(`Line ${lineNumber}: Invalid address operand ${operand.toString().padStart(3, '0')} for opcode ${opcode} at address ${address}`);
       }
     }
 
-    // HLT (opcode 10) should ideally have operand 000
-    if (opcode === 10 && operand !== 0) {
+    // HLT (opcode 100) should ideally have operand 000
+    if (opcode === 100 && operand !== 0) {
       this.warnings.push(`Line ${lineNumber}: HLT instruction ignores operand; received ${operand.toString().padStart(3, '0')} at address ${address}`);
     }
   }

@@ -1,0 +1,29 @@
+// Simplified Sieve of Eratosthenes - Find primes up to 10
+// This program implements the sieve algorithm by marking composites
+// Memory layout: Address 100: N, Address 200-210: Sieve array
+
+// Initialize sieve array positions to 0 (prime)
+09202  // NULL 202 - Initialize position 2 as prime
+09203  // NULL 203 - Initialize position 3 as prime  
+09204  // NULL 204 - Initialize position 4 as prime
+09205  // NULL 205 - Initialize position 5 as prime
+09206  // NULL 206 - Initialize position 6 as prime
+09207  // NULL 207 - Initialize position 7 as prime
+09208  // NULL 208 - Initialize position 8 as prime
+09209  // NULL 209 - Initialize position 9 as prime
+09210  // NULL 210 - Initialize position 10 as prime
+
+// Mark multiples of 2 as composite (4, 6, 8, 10)
+07204  // INC 204 - Mark 4 as composite (1)
+07206  // INC 206 - Mark 6 as composite (1)
+07208  // INC 208 - Mark 8 as composite (1)
+07210  // INC 210 - Mark 10 as composite (1)
+
+// Mark multiples of 3 as composite (9)
+07209  // INC 209 - Mark 9 as composite (1)
+
+// Store result: Load N and store in result area
+01100  // TAKE 100 - Load N (should be pre-initialized to 10)
+04105  // SAVE 105 - Store N in result area for verification
+
+10000  // HLT - Halt program

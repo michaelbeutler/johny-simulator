@@ -5,49 +5,51 @@ export const JOHNNY_CONFIG = {
   MEMORY_SIZE: 1000,
   MAX_VALUE: 19999,
   MAX_STEPS: 100000,
-  INSTRUCTION_FORMAT: 5, // 5-digit instructions
+  INSTRUCTION_FORMAT: 5, // 5-digit instructions (OOXXX format)
 } as const;
 
 export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
   0: {
-    name: 'FETCH',
-    description: 'Fetch instruction (internal)',
-    hasOperand: true,
-    operandType: 'ADDRESS',
+    name: 'DATA',
+    description: 'Data word (no operation)',
+    hasOperand: false,
+    operandType: 'NONE',
     execute: (state: ExecutionState, _operand: number) => {
-      // FETCH is handled internally by the simulator
+      // Data word - no operation, just increment PC
     }
   },
-  1: {
+  10: {
     name: 'TAKE',
     description: 'Load value from memory address into accumulator',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      state.acc = state.ram[operand];
+      state.acc = state.ram[operand] || 0; // Handle undefined/null values
     }
   },
-  2: {
+  20: {
     name: 'ADD',
     description: 'Add value from memory address to accumulator',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      state.acc += state.ram[operand];
+      const value = state.ram[operand] || 0; // Handle undefined/null values
+      state.acc += value;
       if (state.acc > JOHNNY_CONFIG.MAX_VALUE) state.acc = JOHNNY_CONFIG.MAX_VALUE;
     }
   },
-  3: {
+  30: {
     name: 'SUB',
     description: 'Subtract value from memory address from accumulator',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      state.acc -= state.ram[operand];
+      const value = state.ram[operand] || 0; // Handle undefined/null values
+      state.acc -= value;
       if (state.acc < 0) state.acc = 0;
     }
   },
-  4: {
+  40: {
     name: 'SAVE',
     description: 'Store accumulator value to memory address',
     hasOperand: true,
@@ -56,7 +58,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = state.acc;
     }
   },
-  5: {
+  50: {
     name: 'JMP',
     description: 'Jump to memory address',
     hasOperand: true,
@@ -65,36 +67,38 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.pc = operand; // Jump directly to the address
     }
   },
-  6: {
+  60: {
     name: 'TST',
     description: 'Skip next instruction if memory address contains zero',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      if (state.ram[operand] === 0) {
+      if ((state.ram[operand] || 0) === 0) {
         state.pc++; // Skip next instruction
       }
     }
   },
-  7: {
+  70: {
     name: 'INC',
     description: 'Increment value at memory address',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      state.ram[operand] = (state.ram[operand] + 1) % (JOHNNY_CONFIG.MAX_VALUE + 1);
+      const currentValue = state.ram[operand] || 0; // Handle undefined/null values
+      state.ram[operand] = (currentValue + 1) % (JOHNNY_CONFIG.MAX_VALUE + 1);
     }
   },
-  8: {
+  80: {
     name: 'DEC',
     description: 'Decrement value at memory address',
     hasOperand: true,
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
-      state.ram[operand] = Math.max(0, state.ram[operand] - 1);
+      const currentValue = state.ram[operand] || 0; // Handle undefined/null values
+      state.ram[operand] = Math.max(0, currentValue - 1);
     }
   },
-  9: {
+  90: {
     name: 'NULL',
     description: 'Set memory address to zero',
     hasOperand: true,
@@ -103,7 +107,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = 0;
     }
   },
-  10: {
+  100: {
     name: 'HLT',
     description: 'Halt program execution',
     hasOperand: false,
@@ -135,13 +139,12 @@ export function loadOpcodeMapping(configPath?: string): OpcodeMapping {
  * Validate if an opcode is valid in the current mapping
  */
 export function isValidOpcode(opcode: number, mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING): boolean {
-  return opcode in mapping || opcode === 0; // 0 is always valid for data
+  return opcode in mapping; // All opcodes including 0 are in the mapping
 }
 
 /**
  * Get instruction name for display purposes
  */
 export function getInstructionName(opcode: number, mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING): string {
-  if (opcode === 0) return 'DATA';
   return mapping[opcode]?.name || `UNKNOWN(${opcode})`;
 }
