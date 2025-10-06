@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Test Runner for JOHNNY RAM Programs with comprehensive testing capabilities
 import * as fs from 'fs';
-import * as path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const chalk = require('chalk');
 import { TestFramework } from '../testing/framework';
 import { TestCase } from '../types';
@@ -126,7 +126,7 @@ export class TestRunner {
         { a: 12, b: 12, result: 144 },
       ];
 
-      multiplyTests.forEach(({ a, b, result }) => {
+      multiplyTests.forEach(({ a, b, result: _result }) => {
         tests.push(
           this.framework.createMultiplicationTest(
             `Multiply ${a} × ${b}`,

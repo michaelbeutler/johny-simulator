@@ -2,6 +2,7 @@
 // Enhanced JOHNNY RAM Validator with TypeScript and improved syntax handling
 import * as fs from 'fs';
 import * as path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const chalk = require('chalk');
 import { RamValidator } from '../validation/validator';
 import { RamParser } from '../core/parser';
@@ -75,12 +76,6 @@ class ValidatorCLI {
     );
 
     let allValid = true;
-    const results: Array<{
-      file: string;
-      valid: boolean;
-      errors: number;
-      warnings: number;
-    }> = [];
 
     ramFiles.forEach(file => {
       const result = this.validateSingleFile(file, false, false);

@@ -168,6 +168,7 @@ export class RamParser {
    * Parse from file path
    */
   parseFile(filePath: string): ParseResult {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require('fs');
     try {
       const content = fs.readFileSync(filePath, 'utf8');

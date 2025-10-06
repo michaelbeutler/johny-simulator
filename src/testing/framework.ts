@@ -8,6 +8,7 @@ import {
 import { JohnnySimulator } from '../core/simulator';
 import { RamValidator } from '../validation/validator';
 import { RamParser } from '../core/parser';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const chalk = require('chalk');
 
 export class TestFramework {
@@ -27,7 +28,7 @@ export class TestFramework {
   async runTest(testCase: TestCase): Promise<TestResult> {
     const startTime = Date.now();
     const errors: string[] = [];
-    const actualResults: Record<string, any> = {};
+    const actualResults: Record<string, unknown> = {};
 
     try {
       // Parse the program
@@ -130,7 +131,7 @@ export class TestFramework {
   private checkExpectations(
     expectations: TestExpectation[],
     finalState: ExecutionState,
-    actualResults: Record<string, any>
+    _actualResults: Record<string, unknown>
   ): { errors: string[] } {
     const errors: string[] = [];
 

@@ -2,6 +2,7 @@
 // Interactive JOHNNY RAM Simulator
 import * as fs from 'fs';
 import * as readline from 'readline';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const chalk = require('chalk');
 import { JohnnySimulator } from '../core/simulator';
 import { RamValidator } from '../validation/validator';
@@ -45,6 +46,7 @@ class InteractiveSimulator {
    * Main interaction loop
    */
   private async mainLoop(): Promise<void> {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
         const command = await this.prompt('\n> ');

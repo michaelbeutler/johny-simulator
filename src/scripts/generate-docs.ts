@@ -60,7 +60,7 @@ class DocumentationGenerator {
         .filter(file => file.endsWith('.ram'))
         .map(file => join('scripts', file));
     } catch (error) {
-      console.error('Error reading scripts directory:', error);
+      console.error('Error updating docs:', (error as Error).message);
       return [];
     }
   }
@@ -84,8 +84,12 @@ class DocumentationGenerator {
       return {
         filename,
         valid: validationResult.isValid,
-        errors: validationResult.errors.map((e: any) => e.message),
-        warnings: validationResult.warnings.map((w: any) => w.message),
+        errors: validationResult.errors.map(
+          (e: { message: string }) => e.message
+        ),
+        warnings: validationResult.warnings.map(
+          (w: { message: string }) => w.message
+        ),
         stats: {
           instructions: validationResult.statistics.totalInstructions,
           dataWords: validationResult.statistics.dataWords,
@@ -222,7 +226,7 @@ class DocumentationGenerator {
       if (placeholderMatch) {
         existingUserContent = placeholderMatch[1].trim() + '\n\n';
       }
-    } catch (error) {
+    } catch {
       // File doesn't exist or can't be read - create new
     }
 
@@ -243,7 +247,8 @@ class DocumentationGenerator {
       if (analysis.testResults.descriptions.length > 0) {
         autoContent += `## 🧪 Test Cases\n\n`;
         analysis.testResults.descriptions.forEach((desc, index) => {
-          const status = index < analysis.testResults!.passed ? '✅' : '❌';
+          const status =
+            index < (analysis.testResults?.passed ?? 0) ? '✅' : '❌';
           autoContent += `- ${status} ${desc}\n`;
         });
         autoContent += `\n`;
@@ -294,7 +299,7 @@ class DocumentationGenerator {
       autoContent += `\`\`\`\n`;
       autoContent += sourceCode;
       autoContent += `\n\`\`\`\n`;
-    } catch (error) {
+    } catch {
       autoContent += `## 💾 Source Code\n\n*Could not read source file*\n`;
     }
 
@@ -383,7 +388,7 @@ class DocumentationGenerator {
    * Parse test runner output to extract pass/fail counts
    * Note: This is simplified for demo purposes - in production you'd integrate with test runner API
    */
-  private parseTestOutput(output: string): {
+  private parseTestOutput(_output: string): {
     passed: number;
     failed: number;
     total: number;

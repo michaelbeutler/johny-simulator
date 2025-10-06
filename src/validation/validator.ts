@@ -10,7 +10,6 @@ import {
   DEFAULT_OPCODE_MAPPING,
   JOHNNY_CONFIG,
   isValidOpcode,
-  getInstructionName,
 } from '../core/opcodes';
 import { RamParser } from '../core/parser';
 
@@ -46,15 +45,15 @@ export class RamValidator {
       };
     }
 
-    return this.validateProgram(parseResult.ram, parseResult.lineMapping);
+    return this.validate(parseResult.ram, parseResult.lineMapping);
   }
 
   /**
    * Validate a RAM program from memory array
    */
-  validateProgram(
+  validate(
     ram: number[],
-    lineMapping?: Map<number, number>
+    _lineMapping?: Map<number, number>
   ): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];

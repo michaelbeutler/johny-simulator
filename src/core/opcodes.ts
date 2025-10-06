@@ -14,7 +14,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     description: 'Data word (no operation)',
     hasOperand: false,
     operandType: 'NONE',
-    execute: (state: ExecutionState, _operand: number) => {
+    execute: (_state: ExecutionState, _operand: number) => {
       // Data word - no operation, just increment PC
     },
   },
@@ -126,10 +126,11 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
 export function loadOpcodeMapping(configPath?: string): OpcodeMapping {
   if (configPath) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs');
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       return { ...DEFAULT_OPCODE_MAPPING, ...config };
-    } catch (error) {
+    } catch {
       console.warn(
         `Failed to load opcode mapping from ${configPath}, using default`
       );

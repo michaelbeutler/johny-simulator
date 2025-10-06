@@ -88,7 +88,7 @@ export interface TestResult {
   executionTime: number;
   steps: number;
   errors: string[];
-  actualResults: Record<string, any>;
+  actualResults: Record<string, unknown>;
   trace?: ExecutionTrace[];
 }
 
@@ -113,8 +113,8 @@ export interface SimulationConfig {
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 export interface Logger {
-  debug(message: string, ...args: any[]): void;
-  info(message: string, ...args: any[]): void;
-  warn(message: string, ...args: any[]): void;
-  error(message: string, ...args: any[]): void;
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
 }

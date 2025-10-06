@@ -1,4 +1,3 @@
-// @ts-ignore
 import { describe, test, expect } from 'bun:test';
 import { JohnnySimulator } from '../src/core/simulator';
 import { RamParser } from '../src/core/parser';
