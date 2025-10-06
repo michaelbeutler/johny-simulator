@@ -4,7 +4,8 @@ import { RamParser } from '../src/core/parser';
 import { RamValidator } from '../src/validation/validator';
 
 describe('Sieve of Eratosthenes Program Tests', () => {
-  const simulator = new JohnnySimulator();
+  // Use reduced max steps for faster infinite loop detection
+  const simulator = new JohnnySimulator(undefined, { maxSteps: 10000 });
   const parser = new RamParser();
   const validator = new RamValidator();
 

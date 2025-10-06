@@ -3,8 +3,9 @@ import { JohnnySimulator } from '../src/core/simulator';
 import { RamParser } from '../src/core/parser';
 import { RamValidator } from '../src/validation/validator';
 
-describe('Multiplication Program Tests', () => {
-  const simulator = new JohnnySimulator();
+describe('Multiply Program Tests', () => {
+  // Use reduced max steps for faster infinite loop detection
+  const simulator = new JohnnySimulator(undefined, { maxSteps: 10000 });
   const parser = new RamParser();
   const validator = new RamValidator();
 

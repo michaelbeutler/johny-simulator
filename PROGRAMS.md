@@ -6,7 +6,7 @@ _Auto-generated documentation_
 
 - **Total Programs:** 5
 - **Valid Programs:** 5/5
-- **Total Instructions:** 107
+- **Total Instructions:** 116
 
 ## 📁 Programs
 
@@ -14,7 +14,7 @@ _Auto-generated documentation_
 | --------------------------------- | ------ | ------------ | ----- | ---------------- |
 | [sieve](scripts/sieve.md)         | ✅     | 35           | 4/4   | _Auto-generated_ |
 | [addition](scripts/addition.md)   | ✅     | 4            | 5/5   | _Auto-generated_ |
-| [idiv](scripts/idiv.md)           | ✅     | 14           | 11/11 | _Auto-generated_ |
+| [idiv](scripts/idiv.md)           | ✅     | 23           | 12/12 | _Auto-generated_ |
 | [countdown](scripts/countdown.md) | ✅     | 44           | 4/4   | _Auto-generated_ |
 | [multiply](scripts/multiply.md)   | ✅     | 10           | 5/5   | _Auto-generated_ |
 
