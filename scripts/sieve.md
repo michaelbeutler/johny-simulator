@@ -59,15 +59,6 @@ Primes up to 10: 2, 3, 5, 7
 
 Unmarked numbers: 2, 3, 5, 7
 
-## Complexity
-
-- **Time Complexity**: O(N log log N)
-- **Space Complexity**: O(N)
-
-## Historical Background
-
-Named after the Greek mathematician Eratosthenes (3rd century BC), though the method was known earlier. This algorithm remains fundamental to modern sieve methods in analytic number theory.
-
 ## Algorithm Flowchart
 
 ### Complete Wikipedia Algorithm (Theoretical)
@@ -155,7 +146,7 @@ flowchart TD
 
 ### Current Simplified Implementation (Demonstration)
 
-Our actual `sieve.ram` shows basic concepts:
+Actual `sieve.ram` shows basic concepts:
 
 ```mermaid
 flowchart TD
@@ -217,10 +208,6 @@ JOHNNY RAM **DOES support loops** using jump instructions. Looking at existing p
 | **Conditional Logic** | ✅ TST instruction for zero-testing           |
 | **Loop Termination**  | ✅ Counter-based with DEC + TST + JMP         |
 
-### � **Complete Implementation IS Possible!**
-
-Thanks to your correction about loop capabilities, a **full Sieve of Eratosthenes** can be implemented in JOHNNY RAM using:
-
 **Proposed Complete Algorithm Structure:**
 
 ```
@@ -271,14 +258,6 @@ OUTER_LOOP:
 - Extensive testing for correctness
 
 **However, the complete Sieve of Eratosthenes IS implementable** in JOHNNY RAM using the jump-based loop patterns shown in countdown.ram and multiply.ram!
-
-### 🎯 **Educational Value & Next Steps**
-
-Our current implementation demonstrates:
-
-1. ✅ **Basic sieve concepts** (array marking, prime/composite logic)
-2. ✅ **JOHNNY programming patterns** (memory layout, basic operations)
-3. ✅ **Foundation for expansion** to full algorithm
 
 **Future Enhancement:** The current demonstration could be expanded to a complete implementation using the available loop patterns!
 
