@@ -10,7 +10,13 @@
     "simulate": "bun run src/scripts/simulator.ts",
     "docs": "bun run src/scripts/generate-docs.ts",
     "clean": "rm -rf dist *.md",
-    "dev": "bun test --watch"
+    "dev": "bun test --watch",
+    "lint": "eslint . --ext .ts,.js,.json --fix",
+    "lint:check": "eslint . --ext .ts,.js,.json",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
+    "prepare": "husky install",
+    "pre-commit": "lint-staged"
   },
   "keywords": [
     "validator",
@@ -29,10 +35,18 @@
     "chalk": "^4.1.2"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/jest": "^29.0.0",
-    "typescript": "^5.0.0",
-    "bun-types": "latest"
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "bun-types": "latest",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
