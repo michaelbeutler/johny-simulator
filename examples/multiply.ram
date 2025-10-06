@@ -1,0 +1,44 @@
+# Multiplication by Repeated Addition
+# Computes 7 × 6 = 42
+
+1030    # TAKE 30 - load multiplicand (7)
+4035    # SAVE 35 - save to result accumulator  
+1031    # TAKE 31 - load multiplier (6)
+4036    # SAVE 36 - save to counter
+
+# Loop: multiply by adding multiplicand counter times
+6036    # TST 36 - test if counter = 0
+5013    # JMP 13 - if zero, we're done
+
+1035    # TAKE 35 - load current result
+2030    # ADD 30 - add multiplicand
+4035    # SAVE 35 - save new result
+
+1036    # TAKE 36 - load counter  
+3032    # SUB 32 - subtract 1
+4036    # SAVE 36 - save new counter
+5005    # JMP 5 - loop back
+
+# Done
+1035    # TAKE 35 - load final result
+4037    # SAVE 37 - save to output address
+10000   # HLT - halt
+
+0       # padding
+0
+0
+0
+0
+0
+0
+0
+0
+0
+7       # address 30: multiplicand
+6       # address 31: multiplier  
+1       # address 32: decrement value
+0       # address 33: unused
+0       # address 34: unused
+0       # address 35: result accumulator
+0       # address 36: counter
+0       # address 37: final output

@@ -1,0 +1,9 @@
+{
+  "preset": "bun",
+  "testMatch": ["**/scripts/**/*.test.ts"],
+  "collectCoverageFrom": [
+    "src/**/*.ts",
+    "!src/**/*.d.ts"
+  ],
+  "testEnvironment": "node"
+}
