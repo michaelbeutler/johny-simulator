@@ -53,10 +53,46 @@ describe('Addition Program Tests', () => {
 
   test('should handle large numbers', async () => {
     const parseResult = parser.parseFile('scripts/addition.ram');
-    const initialMemory = { 100: 9999, 101: 9999 };
+    const initialMemory = { 100: 19999, 101: 0 };
     const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
 
     expect(finalState.halted).toBe(true);
-    expect(finalState.ram[102]).toBe(19998);
+    expect(finalState.ram[102]).toBe(19999); // Should handle max value
+  });
+
+  test('should handle overflow saturation at MAX_VALUE', async () => {
+    const parseResult = parser.parseFile('scripts/addition.ram');
+    const initialMemory = { 100: 19998, 101: 5 }; // Should saturate at 19999
+    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+
+    expect(finalState.halted).toBe(true);
+    expect(finalState.ram[102]).toBe(19999); // Should saturate, not overflow
+  });
+
+  test('should handle maximum values addition', async () => {
+    const parseResult = parser.parseFile('scripts/addition.ram');
+    const initialMemory = { 100: 19999, 101: 19999 }; // MAX + MAX
+    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+
+    expect(finalState.halted).toBe(true);
+    expect(finalState.ram[102]).toBe(19999); // Should saturate at max
+  });
+
+  test('should handle zero plus zero', async () => {
+    const parseResult = parser.parseFile('scripts/addition.ram');
+    const initialMemory = { 100: 0, 101: 0 };
+    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+
+    expect(finalState.halted).toBe(true);
+    expect(finalState.ram[102]).toBe(0);
+  });
+
+  test('should handle single operand non-zero', async () => {
+    const parseResult = parser.parseFile('scripts/addition.ram');
+    const initialMemory = { 100: 1, 101: 0 };
+    const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
+
+    expect(finalState.halted).toBe(true);
+    expect(finalState.ram[102]).toBe(1);
   });
 });
