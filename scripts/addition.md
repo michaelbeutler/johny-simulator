@@ -5,6 +5,7 @@ This program demonstrates basic addition in the JOHNNY RAM simulator.
 ## How to Use
 
 ### Browser Simulator
+
 1. Load `addition.ram` into the browser simulator
 2. Manually set memory values:
    - `memory[100] = first number` (e.g., 15)
@@ -13,6 +14,7 @@ This program demonstrates basic addition in the JOHNNY RAM simulator.
 4. Check `memory[102]` for the result (40)
 
 ### TypeScript Simulator
+
 ```bash
 npm test # Includes addition tests: 15+25=40, boundary conditions, large numbers
 ```
@@ -20,16 +22,19 @@ npm test # Includes addition tests: 15+25=40, boundary conditions, large numbers
 ## Algorithm
 
 The program uses three simple instructions:
+
 1. **TAKE**: Load first number from memory[100] into accumulator
 2. **ADD**: Add second number from memory[101] to accumulator
 3. **SAVE**: Store result from accumulator to memory[102]
 
 ## Memory Layout
+
 - **Address 100**: First operand (addend)
 - **Address 101**: Second operand (addend)
 - **Address 102**: Result (sum)
 
 ## Examples
+
 - `15 + 25 = 40`
 - `0 + 100 = 100`
 - `9999 + 9999 = 19998` (within JOHNNY's 19999 limit)
@@ -39,7 +44,7 @@ The program uses three simple instructions:
 
 **Status:** ✅ VALID
 
-**Tests:** ✅ 5/5 passed
+**Tests:** ✅ 9/9 passed
 
 ## 🧪 Test Cases
 
@@ -48,6 +53,10 @@ The program uses three simple instructions:
 - ✅ should add using embedded data (15 + 25 = 40)
 - ✅ should add negative simulation (0 - bounded)
 - ✅ should handle large numbers
+- ✅ should handle overflow saturation at MAX_VALUE
+- ✅ should handle maximum values addition
+- ✅ should handle zero plus zero
+- ✅ should handle single operand non-zero
 
 ## Program Statistics
 

@@ -13,7 +13,7 @@ _Auto-generated documentation_
 | Program                           | Status | Instructions | Tests | Description      |
 | --------------------------------- | ------ | ------------ | ----- | ---------------- |
 | [sieve](scripts/sieve.md)         | ✅     | 35           | 4/4   | _Auto-generated_ |
-| [addition](scripts/addition.md)   | ✅     | 4            | 5/5   | _Auto-generated_ |
+| [addition](scripts/addition.md)   | ✅     | 4            | 9/9   | _Auto-generated_ |
 | [idiv](scripts/idiv.md)           | ✅     | 23           | 12/12 | _Auto-generated_ |
 | [countdown](scripts/countdown.md) | ✅     | 44           | 4/4   | _Auto-generated_ |
 | [multiply](scripts/multiply.md)   | ✅     | 10           | 5/5   | _Auto-generated_ |
