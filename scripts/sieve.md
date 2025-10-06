@@ -278,65 +278,73 @@ Our current implementation demonstrates:
 ## 🧪 Test Cases
 
 - ✅ should validate sieve program
-- ✅ should demonstrate sieve concepts with N=10
+- ✅ should implement sieve algorithm for N=20
 - ✅ should demonstrate sieve concept with memory operations
 - ✅ should handle basic arithmetic operations correctly
 
 ## Program Statistics
 
-- **Instructions:** 17
-- **Data Words:** 0
-- **Memory Used:** 0-16
+- **Instructions:** 18
+- **Data Words:** 2
+- **Memory Used:** 0-19
 - **Has HALT:** Yes
 
 ## ⚠️ Warnings
 
 - HLT instruction ignores operand; received 100
+- HLT instruction ignores operand; received 018
+- HLT instruction ignores operand; received 019
 
 ## 📋 Program Disassembly
 
 ```
 Addr | Value | Instruction  | Comment
 -----|-------|--------------|--------
-000 | 09202 | NULL 202     | mem[202] = 0
-001 | 09203 | NULL 203     | mem[203] = 0
-002 | 09204 | NULL 204     | mem[204] = 0
-003 | 09205 | NULL 205     | mem[205] = 0
-004 | 09206 | NULL 206     | mem[206] = 0
-005 | 09207 | NULL 207     | mem[207] = 0
-006 | 09208 | NULL 208     | mem[208] = 0
-007 | 09209 | NULL 209     | mem[209] = 0
-008 | 09210 | NULL 210     | mem[210] = 0
-009 | 07204 | INC 204      | mem[204] = mem[204] + 1
-010 | 07206 | INC 206      | mem[206] = mem[206] + 1
-011 | 07208 | INC 208      | mem[208] = mem[208] + 1
-012 | 07210 | INC 210      | mem[210] = mem[210] + 1
-013 | 07209 | INC 209      | mem[209] = mem[209] + 1
-014 | 01100 | TAKE 100     | Load mem[100] into ACC
-015 | 04105 | SAVE 105     | mem[105] = ACC
-016 | 10000 | HLT 000      | Halt program
-017 | 00000 | DATA         | Empty
-018 | 00000 | DATA         | Empty
+000 | 01100 | TAKE 100     | Load mem[100] into ACC
+001 | 04101 | SAVE 101     | mem[101] = ACC
+002 | 01018 | TAKE 018     | Load mem[18] into ACC
+003 | 04102 | SAVE 102     | mem[102] = ACC
+004 | 01019 | TAKE 019     | Load mem[19] into ACC
+005 | 04103 | SAVE 103     | mem[103] = ACC
+006 | 07204 | INC 204      | mem[204] = mem[204] + 1
+007 | 07206 | INC 206      | mem[206] = mem[206] + 1
+008 | 07208 | INC 208      | mem[208] = mem[208] + 1
+009 | 07210 | INC 210      | mem[210] = mem[210] + 1
+010 | 07212 | INC 212      | mem[212] = mem[212] + 1
+011 | 07214 | INC 214      | mem[214] = mem[214] + 1
+012 | 07216 | INC 216      | mem[216] = mem[216] + 1
+013 | 07218 | INC 218      | mem[218] = mem[218] + 1
+014 | 07220 | INC 220      | mem[220] = mem[220] + 1
+015 | 07209 | INC 209      | mem[209] = mem[209] + 1
+016 | 07215 | INC 215      | mem[215] = mem[215] + 1
+017 | 10000 | HLT 000      | Halt program
+018 | 00200 | DATA         | Value: 200
+019 | 00002 | DATA         | Value: 2
+020 | 00000 | DATA         | Empty
+021 | 00000 | DATA         | Empty
 ```
 
 ## 💾 Source Code
 
 ```
-09202
-09203
-09204
-09205
-09206
-09207
-09208
-09209
-09210
+01100
+04101
+01018
+04102
+01019
+04103
 07204
 07206
 07208
 07210
+07212
+07214
+07216
+07218
+07220
 07209
-01100
-04105
+07215
 10000
+00200
+00002
 ```
