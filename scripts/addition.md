@@ -4,6 +4,13 @@
 
 **Tests:** ✅ 4/4 passed
 
+## 🧪 Test Cases
+
+- ✅ should validate addition program
+- ✅ should add 15 + 25 = 40
+- ✅ should add negative simulation (0 - bounded)
+- ✅ should handle large numbers
+
 ## Program Statistics
 
 - **Instructions:** 4

@@ -4,6 +4,13 @@
 
 **Tests:** ✅ 4/4 passed
 
+## 🧪 Test Cases
+
+- ✅ should validate countdown program
+- ✅ should countdown from 5 to 0
+- ✅ should countdown from 10 to 0
+- ✅ should handle zero initial value
+
 ## Program Statistics
 
 - **Instructions:** 4

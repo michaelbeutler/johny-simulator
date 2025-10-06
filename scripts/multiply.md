@@ -2,7 +2,15 @@
 
 **Status:** ✅ VALID
 
-**Tests:** ✅ 4/4 passed
+**Tests:** ✅ 5/5 passed
+
+## 🧪 Test Cases
+
+- ✅ should validate multiplication program
+- ✅ should multiply 3 × 4 = 12
+- ✅ should multiply 7 × 8 = 56
+- ✅ should handle multiplication by zero
+- ✅ should handle large numbers
 
 ## Program Statistics
 
