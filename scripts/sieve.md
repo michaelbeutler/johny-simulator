@@ -59,6 +59,62 @@ Unmarked numbers: 2, 3, 5, 7
 
 Named after the Greek mathematician Eratosthenes (3rd century BC), though the method was known earlier. This algorithm remains fundamental to modern sieve methods in analytic number theory.
 
+## Algorithm Flowchart
+
+The following UML 2.0 compliant flowchart documents the Sieve of Eratosthenes algorithm implementation:
+
+```mermaid
+flowchart TD
+    Start([Start Program]) --> Init[Initialize Memory<br/>NULL operations clear<br/>addresses 202-210]
+    
+    Init --> SetMarkers[Set Composite Markers<br/>INC operations mark<br/>addresses 204, 206, 208-210]
+    
+    SetMarkers --> LoadN[TAKE 100<br/>Load upper limit N<br/>into accumulator]
+    
+    LoadN --> SaveResult[SAVE 105<br/>Store N in<br/>output address]
+    
+    SaveResult --> Halt[HLT<br/>Halt Program]
+    
+    Halt --> End([End])
+    
+    %% Styling for UML 2.0 compliance
+    classDef startEnd fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    classDef decision fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef data fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px,color:#000
+    
+    class Start,End startEnd
+    class Init,SetMarkers,LoadN,SaveResult,Halt process
+```
+
+### Flowchart Legend
+
+| Symbol | UML 2.0 Element | Description |
+|--------|-----------------|-------------|
+| ![Start/End](https://img.shields.io/badge/-Oval-e1f5fe?style=flat) | **Initial/Final Node** | Program start and end points |
+| ![Process](https://img.shields.io/badge/-Rectangle-f3e5f5?style=flat) | **Activity Node** | Processing steps and operations |
+| ![Decision](https://img.shields.io/badge/-Diamond-fff3e0?style=flat) | **Decision Node** | Conditional branching (not used in this simple implementation) |
+| ![Data](https://img.shields.io/badge/-Parallelogram-e8f5e8?style=flat) | **Data Node** | Data input/output operations |
+
+### Memory Operations Mapping
+
+| Flowchart Step | RAM Instructions | Memory Addresses | Purpose |
+|----------------|------------------|------------------|---------|
+| Initialize Memory | `NULL 202-210` | 202-210 | Clear sieve array positions |
+| Set Composite Markers | `INC 204,206,208-210` | 204,206,208-210 | Mark known composites (4,6,8,9,10) |
+| Load N | `TAKE 100` | 100 → ACC | Load upper limit into accumulator |
+| Save Result | `SAVE 105` | ACC → 105 | Store limit for reference |
+| Halt Program | `HLT` | - | Terminate execution |
+
+### Algorithm Complexity Analysis
+
+- **Time Complexity**: O(N) for this simplified implementation
+- **Space Complexity**: O(N) for sieve array storage
+- **Memory Footprint**: 18 instructions + data storage
+- **Execution Steps**: Linear sequence without loops in current implementation
+
+**Note**: This implementation represents a simplified demonstration of sieve concepts. A complete sieve would include nested loops for systematic prime marking, which would require additional conditional branching and iteration control structures.
+
 <!-- AUTO_GENERATED_DOCS_START -->
 <!-- Everything below this line will be replaced by auto-generated documentation -->
 
