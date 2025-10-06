@@ -263,8 +263,7 @@ expect(result.warnings).toBeDefined();          // Warnings array exists
 │   ├── testing/               # Test utilities and helpers
 │   ├── types/                 # TypeScript type definitions
 │   └── validation/            # Validation logic
-├── examples/                  # Example programs and tutorials
-└── simulator/                 # Legacy JavaScript files
+└── examples/                  # Example programs and tutorials
 ```
 
 ## 🛠️ JOHNNY Instruction Set
