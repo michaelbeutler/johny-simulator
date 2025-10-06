@@ -50,6 +50,45 @@ bun run simulate scripts/addition.ram
 | **clean** | `bun run clean` | Clean generated files |
 | **dev** | `bun run dev` | Development mode (test watch) |
 
+## 📖 Documentation System
+
+This project uses an automated documentation generation system for .ram programs that preserves user content while generating technical analysis.
+
+### Placeholder Comment System
+
+Each program's markdown file (e.g., `sieve.md`, `addition.md`) can contain user-written content above a special placeholder comment:
+
+```markdown
+# My Program
+
+User-written documentation, examples, theory, etc.
+
+<!-- AUTO_GENERATED_DOCS_START -->
+<!-- Everything below this line will be replaced by auto-generated documentation -->
+```
+
+Everything **above** the placeholder is preserved when regenerating docs.
+Everything **below** the placeholder is replaced with auto-generated content including:
+
+- ✅ **Status**: Program validation status
+- 🧪 **Test Cases**: Results from test suites  
+- 📊 **Statistics**: Instructions, memory usage, etc.
+- ⚠️ **Warnings**: Any validation warnings
+- 📋 **Disassembly**: Human-readable instruction breakdown
+- 💾 **Source Code**: Raw .ram file contents
+
+### Generating Documentation
+
+```bash
+npm run docs
+```
+
+This will:
+1. Scan all `.ram` files in the `scripts/` directory
+2. Analyze each program (validation, testing, disassembly)
+3. Update individual `.md` files (preserving user content above placeholder)
+4. Generate master `PROGRAMS.md` with overview
+
 ## ➕ Adding New Programs
 
 To add a new JOHNNY RAM program, follow this structure:
@@ -104,18 +143,34 @@ describe('My Program Tests', () => {
 });
 ```
 
-### 3. Generate Documentation
+### 3. Create Documentation Template
 
-```bash
-# Auto-generate the .md file and update README
-bun run docs
+Create `scripts/my-program.md` with user content and placeholder:
+
+```markdown
+# My Program
+
+Explain what your program does, how to use it, etc.
+
+## How to Use
+
+### Browser Simulator
+1. Load `my-program.ram` into the browser simulator
+2. Set memory values as needed
+3. Run the program
+
+<!-- AUTO_GENERATED_DOCS_START -->
+<!-- Everything below this line will be replaced by auto-generated documentation -->
 ```
 
-This will create `scripts/my-program.md` with:
-- ✅ Validation status
-- 🧪 Test cases with "should..." descriptions
-- 📋 Program disassembly
-- 📊 Statistics
+### 4. Generate Documentation
+
+```bash
+# Auto-generate technical analysis and update all docs
+npm run docs
+```
+
+This will update `scripts/my-program.md` with your user content preserved above the placeholder, plus auto-generated technical analysis below.
 
 ## 🧪 Testing Helpers
 

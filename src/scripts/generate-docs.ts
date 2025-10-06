@@ -125,16 +125,17 @@ class DocumentationGenerator {
       const value = ram[addr];
       if (value !== 0 || addr <= lastAddr + 2) {
         const valueStr = value.toString().padStart(5, '0');
-        const opcode = parseInt(valueStr.slice(0, 2), 10);
+        const opcodeDigits = parseInt(valueStr.slice(0, 2), 10);
+        const opcode = opcodeDigits * 10; // Convert to actual opcode (01 -> 10, 02 -> 20, etc.)
         const operand = valueStr.slice(2);
         
         let instruction: string;
         let comment: string;
         
-        if (opcode === 0 && value > 0) {
+        if (opcodeDigits === 0 && value > 0) {
           instruction = 'DATA';
           comment = `Value: ${value}`;
-        } else if (opcode === 0) {
+        } else if (opcodeDigits === 0) {
           instruction = 'DATA';
           comment = 'Empty';
         } else {
@@ -152,16 +153,16 @@ class DocumentationGenerator {
 
   private getInstructionComment(opcode: number, operand: number): string {
     switch (opcode) {
-      case 1: return `Load mem[${operand}] into ACC`;
-      case 2: return `ACC = ACC + mem[${operand}]`;
-      case 3: return `ACC = ACC - mem[${operand}]`;
-      case 4: return `mem[${operand}] = ACC`;
-      case 5: return `Jump to address ${operand}`;
-      case 6: return `Skip next if mem[${operand}] = 0`;
-      case 7: return `mem[${operand}] = mem[${operand}] + 1`;
-      case 8: return `mem[${operand}] = mem[${operand}] - 1`;
-      case 9: return `mem[${operand}] = 0`;
-      case 10: return `Halt program`;
+      case 10: return `Load mem[${operand}] into ACC`;
+      case 20: return `ACC = ACC + mem[${operand}]`;
+      case 30: return `ACC = ACC - mem[${operand}]`;
+      case 40: return `mem[${operand}] = ACC`;
+      case 50: return `Jump to address ${operand}`;
+      case 60: return `Skip next if mem[${operand}] = 0`;
+      case 70: return `mem[${operand}] = mem[${operand}] + 1`;
+      case 80: return `mem[${operand}] = mem[${operand}] - 1`;
+      case 90: return `mem[${operand}] = 0`;
+      case 100: return `Halt program`;
       default: return `Unknown instruction`;
     }
   }
@@ -191,74 +192,97 @@ class DocumentationGenerator {
     const baseName = analysis.filename.replace('.ram', '');
     const docPath = join('scripts', `${baseName}.md`);
     
-    let content = `# ${baseName.toUpperCase()} Program\n\n`;
+    // Check if existing file has placeholder comment
+    let existingUserContent = '';
+    try {
+      const existingContent = readFileSync(docPath, 'utf8');
+      const placeholderMatch = existingContent.match(/([\s\S]*?)<!-- AUTO_GENERATED_DOCS_START -->/);
+      if (placeholderMatch) {
+        existingUserContent = placeholderMatch[1].trim() + '\n\n';
+      }
+    } catch (error) {
+      // File doesn't exist or can't be read - create new
+    }
+    
+    // Generate auto-docs content
+    let autoContent = `<!-- AUTO_GENERATED_DOCS_START -->\n`;
+    autoContent += `<!-- Everything below this line will be replaced by auto-generated documentation -->\n\n`;
     
     // Status badge
     const statusBadge = analysis.valid ? '✅ VALID' : '❌ INVALID';
-    content += `**Status:** ${statusBadge}\n\n`;
+    autoContent += `**Status:** ${statusBadge}\n\n`;
     
     // Test results
     if (analysis.testResults) {
       const testBadge = analysis.testResults.failed === 0 ? '✅' : '❌';
-      content += `**Tests:** ${testBadge} ${analysis.testResults.passed}/${analysis.testResults.total} passed\n\n`;
+      autoContent += `**Tests:** ${testBadge} ${analysis.testResults.passed}/${analysis.testResults.total} passed\n\n`;
       
       // Add test descriptions
       if (analysis.testResults.descriptions.length > 0) {
-        content += `## 🧪 Test Cases\n\n`;
+        autoContent += `## 🧪 Test Cases\n\n`;
         analysis.testResults.descriptions.forEach((desc, index) => {
           const status = index < analysis.testResults!.passed ? '✅' : '❌';
-          content += `- ${status} ${desc}\n`;
+          autoContent += `- ${status} ${desc}\n`;
         });
-        content += `\n`;
+        autoContent += `\n`;
       }
     }
     
     // Program statistics
-    content += `## Program Statistics\n\n`;
-    content += `- **Instructions:** ${analysis.stats.instructions}\n`;
-    content += `- **Data Words:** ${analysis.stats.dataWords}\n`;
-    content += `- **Memory Used:** 0-${analysis.stats.maxAddress}\n`;
-    content += `- **Has HALT:** ${analysis.stats.hasHalt ? 'Yes' : 'No'}\n\n`;
+    autoContent += `## Program Statistics\n\n`;
+    autoContent += `- **Instructions:** ${analysis.stats.instructions}\n`;
+    autoContent += `- **Data Words:** ${analysis.stats.dataWords}\n`;
+    autoContent += `- **Memory Used:** 0-${analysis.stats.maxAddress}\n`;
+    autoContent += `- **Has HALT:** ${analysis.stats.hasHalt ? 'Yes' : 'No'}\n\n`;
     
     // Errors and warnings
     if (analysis.errors.length > 0) {
-      content += `## ❌ Errors\n\n`;
+      autoContent += `## ❌ Errors\n\n`;
       analysis.errors.forEach(error => {
-        content += `- ${error}\n`;
+        autoContent += `- ${error}\n`;
       });
-      content += `\n`;
+      autoContent += `\n`;
     }
     
     if (analysis.warnings.length > 0) {
-      content += `## ⚠️ Warnings\n\n`;
+      autoContent += `## ⚠️ Warnings\n\n`;
       analysis.warnings.forEach(warning => {
-        content += `- ${warning}\n`;
+        autoContent += `- ${warning}\n`;
       });
-      content += `\n`;
+      autoContent += `\n`;
     }
     
     // Disassembly
-    content += `## 📋 Program Disassembly\n\n`;
-    content += `\`\`\`\n`;
-    content += `Addr | Value | Instruction  | Comment\n`;
-    content += `-----|-------|--------------|--------\n`;
+    autoContent += `## 📋 Program Disassembly\n\n`;
+    autoContent += `\`\`\`\n`;
+    autoContent += `Addr | Value | Instruction  | Comment\n`;
+    autoContent += `-----|-------|--------------|--------\n`;
     analysis.disassembly.forEach(line => {
-      content += `${line}\n`;
+      autoContent += `${line}\n`;
     });
-    content += `\`\`\`\n\n`;
+    autoContent += `\`\`\`\n\n`;
     
     // Source code
     try {
       const sourceCode = readFileSync(join('scripts', analysis.filename), 'utf8');
-      content += `## 💾 Source Code\n\n`;
-      content += `\`\`\`\n`;
-      content += sourceCode;
-      content += `\n\`\`\`\n`;
+      autoContent += `## 💾 Source Code\n\n`;
+      autoContent += `\`\`\`\n`;
+      autoContent += sourceCode;
+      autoContent += `\n\`\`\`\n`;
     } catch (error) {
-      content += `## 💾 Source Code\n\n*Could not read source file*\n`;
+      autoContent += `## 💾 Source Code\n\n*Could not read source file*\n`;
     }
     
-    writeFileSync(docPath, content);
+    // Combine user content with auto-generated content
+    let finalContent;
+    if (existingUserContent) {
+      finalContent = existingUserContent + autoContent;
+    } else {
+      // No existing content or placeholder - create default header
+      finalContent = `# ${baseName.toUpperCase()} Program\n\n${autoContent}`;
+    }
+    
+    writeFileSync(docPath, finalContent);
     console.log(`📝 Generated ${docPath}`);
   }
 

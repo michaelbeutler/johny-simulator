@@ -1,4 +1,46 @@
-# COUNTDOWN Program
+# Countdown Program
+
+This program demonstrates a simple countdown loop that decrements a number until it reaches zero.
+
+## How to Use
+
+### Browser Simulator
+1. Load `countdown.ram` into the browser simulator
+2. Manually set the starting value:
+   - `memory[100] = starting number` (e.g., 5)
+3. Run the program
+4. Watch as the program decrements the value in `memory[100]` until it reaches 0
+5. The program will halt when the countdown reaches 0
+
+### TypeScript Simulator
+```bash
+npm test # Includes countdown tests: from 5→0, from 10→0, zero handling
+```
+
+## Algorithm
+
+The program uses a simple loop structure:
+1. Decrement the value at memory[100]
+2. Test if the value is zero
+3. If not zero, jump back to step 1
+4. If zero, continue to halt
+
+## Memory Layout
+- **Address 100**: Counter value (decrements from initial value to 0)
+
+## Examples
+- Start with 5: 5 → 4 → 3 → 2 → 1 → 0 (halt)
+- Start with 10: 10 → 9 → 8 → ... → 1 → 0 (halt)
+- Start with 0: Immediately halt (no countdown needed)
+
+## Use Cases
+- Timing delays
+- Loop counters
+- Demonstration of conditional branching
+- Basic program flow control
+
+<!-- AUTO_GENERATED_DOCS_START -->
+<!-- Everything below this line will be replaced by auto-generated documentation -->
 
 **Status:** ✅ VALID
 

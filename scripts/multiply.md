@@ -1,4 +1,42 @@
-# MULTIPLY Program
+# Multiply Program
+
+This program demonstrates multiplication using repeated addition in the JOHNNY RAM simulator.
+
+## How to Use
+
+### Browser Simulator
+1. Load `multiply.ram` into the browser simulator
+2. Manually set memory values:
+   - `memory[100] = first number` (multiplicand, e.g., 3)
+   - `memory[101] = second number` (multiplier, e.g., 4)
+3. Run the program
+4. Check `memory[102]` for the result (12)
+
+### TypeScript Simulator
+```bash
+npm test # Includes multiply tests: 3×4=12, 7×8=56, zero handling
+```
+
+## Algorithm
+
+The program implements multiplication as repeated addition:
+- Initialize result to 0
+- Add the multiplicand to result, multiplier times
+- Uses a loop counter to track iterations
+
+## Memory Layout
+- **Address 100**: Multiplicand (first number)
+- **Address 101**: Multiplier (second number, also used as counter)
+- **Address 102**: Result (accumulated sum)
+- **Address 103**: Temporary storage
+
+## Examples
+- `3 × 4 = 12`: Add 3 to itself 4 times (3+3+3+3)
+- `7 × 8 = 56`: Add 7 to itself 8 times
+- `5 × 0 = 0`: Zero multiplier results in zero
+
+<!-- AUTO_GENERATED_DOCS_START -->
+<!-- Everything below this line will be replaced by auto-generated documentation -->
 
 **Status:** ✅ VALID
 
@@ -18,6 +56,10 @@
 - **Data Words:** 0
 - **Memory Used:** 0-9
 - **Has HALT:** Yes
+
+## ⚠️ Warnings
+
+- HLT instruction ignores operand; received 102
 
 ## 📋 Program Disassembly
 
