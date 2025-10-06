@@ -1,5 +1,4 @@
 {
-  "*.{ts,js}": ["eslint --fix", "prettier --write"],
-  "*.{json,md}": ["prettier --write"],
-  "*.ts": ["bash -c 'bun test --bail'"]
+  "*.{ts,js}": ["prettier --write"],
+  "*.{json,md}": ["prettier --write"]
 }

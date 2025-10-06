@@ -1,5 +1,10 @@
 // Comprehensive Test Framework for JOHNNY RAM programs
-import { TestCase, TestResult, TestExpectation, ExecutionState } from '../types';
+import {
+  TestCase,
+  TestResult,
+  TestExpectation,
+  ExecutionState,
+} from '../types';
 import { JohnnySimulator } from '../core/simulator';
 import { RamValidator } from '../validation/validator';
 import { RamParser } from '../core/parser';
@@ -34,7 +39,7 @@ export class TestFramework {
           executionTime: Date.now() - startTime,
           steps: 0,
           errors: parseResult.errors,
-          actualResults: {}
+          actualResults: {},
         };
       }
 
@@ -61,7 +66,11 @@ export class TestFramework {
       actualResults.ram = [...finalState.ram];
 
       // Check expectations
-      const expectationResults = this.checkExpectations(testCase.expectedResults, finalState, actualResults);
+      const expectationResults = this.checkExpectations(
+        testCase.expectedResults,
+        finalState,
+        actualResults
+      );
       errors.push(...expectationResults.errors);
 
       return {
@@ -71,9 +80,8 @@ export class TestFramework {
         steps: finalState.steps,
         errors,
         actualResults,
-        trace: finalState.trace
+        trace: finalState.trace,
       };
-
     } catch (error) {
       return {
         testName: testCase.name,
@@ -81,7 +89,7 @@ export class TestFramework {
         executionTime: Date.now() - startTime,
         steps: 0,
         errors: [`Execution failed: ${(error as Error).message}`],
-        actualResults
+        actualResults,
       };
     }
   }
@@ -91,16 +99,20 @@ export class TestFramework {
    */
   async runTests(testCases: TestCase[]): Promise<TestResult[]> {
     const results: TestResult[] = [];
-    
+
     for (const testCase of testCases) {
       console.log(chalk.blue(`\n🧪 Running test: ${testCase.name}`));
       console.log(chalk.gray(`   ${testCase.description}`));
-      
+
       const result = await this.runTest(testCase);
       results.push(result);
-      
+
       if (result.passed) {
-        console.log(chalk.green(`✅ PASSED (${result.executionTime}ms, ${result.steps} steps)`));
+        console.log(
+          chalk.green(
+            `✅ PASSED (${result.executionTime}ms, ${result.steps} steps)`
+          )
+        );
       } else {
         console.log(chalk.red(`❌ FAILED (${result.executionTime}ms)`));
         result.errors.forEach(error => {
@@ -152,22 +164,30 @@ export class TestFramework {
   /**
    * Check memory expectation
    */
-  private checkMemoryExpectation(expectation: TestExpectation, finalState: ExecutionState, errors: string[]): void {
+  private checkMemoryExpectation(
+    expectation: TestExpectation,
+    finalState: ExecutionState,
+    errors: string[]
+  ): void {
     if (expectation.address === undefined) {
       errors.push(`Memory expectation missing address`);
       return;
     }
 
     const actualValue = finalState.ram[expectation.address];
-    
+
     if (expectation.expectedValue !== undefined) {
       if (actualValue !== expectation.expectedValue) {
-        errors.push(`${expectation.description}: Expected memory[${expectation.address}] = ${expectation.expectedValue}, got ${actualValue}`);
+        errors.push(
+          `${expectation.description}: Expected memory[${expectation.address}] = ${expectation.expectedValue}, got ${actualValue}`
+        );
       }
     } else if (expectation.expectedRange) {
       const { min, max } = expectation.expectedRange;
       if (actualValue < min || actualValue > max) {
-        errors.push(`${expectation.description}: Expected memory[${expectation.address}] in range [${min}, ${max}], got ${actualValue}`);
+        errors.push(
+          `${expectation.description}: Expected memory[${expectation.address}] in range [${min}, ${max}], got ${actualValue}`
+        );
       }
     }
   }
@@ -175,17 +195,25 @@ export class TestFramework {
   /**
    * Check accumulator expectation
    */
-  private checkAccumulatorExpectation(expectation: TestExpectation, finalState: ExecutionState, errors: string[]): void {
+  private checkAccumulatorExpectation(
+    expectation: TestExpectation,
+    finalState: ExecutionState,
+    errors: string[]
+  ): void {
     const actualValue = finalState.acc;
-    
+
     if (expectation.expectedValue !== undefined) {
       if (actualValue !== expectation.expectedValue) {
-        errors.push(`${expectation.description}: Expected ACC = ${expectation.expectedValue}, got ${actualValue}`);
+        errors.push(
+          `${expectation.description}: Expected ACC = ${expectation.expectedValue}, got ${actualValue}`
+        );
       }
     } else if (expectation.expectedRange) {
       const { min, max } = expectation.expectedRange;
       if (actualValue < min || actualValue > max) {
-        errors.push(`${expectation.description}: Expected ACC in range [${min}, ${max}], got ${actualValue}`);
+        errors.push(
+          `${expectation.description}: Expected ACC in range [${min}, ${max}], got ${actualValue}`
+        );
       }
     }
   }
@@ -193,17 +221,25 @@ export class TestFramework {
   /**
    * Check steps expectation
    */
-  private checkStepsExpectation(expectation: TestExpectation, finalState: ExecutionState, errors: string[]): void {
+  private checkStepsExpectation(
+    expectation: TestExpectation,
+    finalState: ExecutionState,
+    errors: string[]
+  ): void {
     const actualSteps = finalState.steps;
-    
+
     if (expectation.expectedValue !== undefined) {
       if (actualSteps !== expectation.expectedValue) {
-        errors.push(`${expectation.description}: Expected ${expectation.expectedValue} steps, got ${actualSteps}`);
+        errors.push(
+          `${expectation.description}: Expected ${expectation.expectedValue} steps, got ${actualSteps}`
+        );
       }
     } else if (expectation.expectedRange) {
       const { min, max } = expectation.expectedRange;
       if (actualSteps < min || actualSteps > max) {
-        errors.push(`${expectation.description}: Expected steps in range [${min}, ${max}], got ${actualSteps}`);
+        errors.push(
+          `${expectation.description}: Expected steps in range [${min}, ${max}], got ${actualSteps}`
+        );
       }
     }
   }
@@ -211,17 +247,27 @@ export class TestFramework {
   /**
    * Check halt expectation
    */
-  private checkHaltExpectation(expectation: TestExpectation, finalState: ExecutionState, errors: string[]): void {
+  private checkHaltExpectation(
+    expectation: TestExpectation,
+    finalState: ExecutionState,
+    errors: string[]
+  ): void {
     const expectedHalted = expectation.expectedValue === 1;
     if (finalState.halted !== expectedHalted) {
-      errors.push(`${expectation.description}: Expected halted = ${expectedHalted}, got ${finalState.halted}`);
+      errors.push(
+        `${expectation.description}: Expected halted = ${expectedHalted}, got ${finalState.halted}`
+      );
     }
   }
 
   /**
    * Check output expectation (for programs that write to specific memory locations)
    */
-  private checkOutputExpectation(expectation: TestExpectation, finalState: ExecutionState, errors: string[]): void {
+  private checkOutputExpectation(
+    expectation: TestExpectation,
+    finalState: ExecutionState,
+    errors: string[]
+  ): void {
     // This can be extended to check specific output patterns or calculations
     if (expectation.address !== undefined) {
       this.checkMemoryExpectation(expectation, finalState, errors);
@@ -241,7 +287,7 @@ export class TestFramework {
     multiplierAddress?: number
   ): TestCase {
     const setup = {
-      initialMemory: {} as Record<number, number>
+      initialMemory: {} as Record<number, number>,
     };
 
     if (multiplicandAddress !== undefined) {
@@ -261,15 +307,15 @@ export class TestFramework {
           type: 'MEMORY',
           address: resultAddress,
           expectedValue: multiplicand * multiplier,
-          description: `Result should be ${multiplicand * multiplier}`
+          description: `Result should be ${multiplicand * multiplier}`,
         },
         {
           type: 'HALT',
           expectedValue: 1,
-          description: 'Program should halt properly'
-        }
+          description: 'Program should halt properly',
+        },
       ],
-      timeout: 50000
+      timeout: 50000,
     };
   }
 
@@ -292,16 +338,20 @@ export class TestFramework {
     }
     console.log(`⏱️  Total Time: ${totalTime}ms`);
     console.log(`🔢 Total Steps: ${totalSteps}`);
-    console.log(`📈 Average Steps per Test: ${Math.round(totalSteps / results.length)}`);
+    console.log(
+      `📈 Average Steps per Test: ${Math.round(totalSteps / results.length)}`
+    );
 
     if (failed > 0) {
       console.log(chalk.red('\n❌ Failed Tests:'));
-      results.filter(r => !r.passed).forEach(result => {
-        console.log(chalk.red(`   • ${result.testName}`));
-        result.errors.slice(0, 2).forEach(error => {
-          console.log(chalk.gray(`     ${error}`));
+      results
+        .filter(r => !r.passed)
+        .forEach(result => {
+          console.log(chalk.red(`   • ${result.testName}`));
+          result.errors.slice(0, 2).forEach(error => {
+            console.log(chalk.gray(`     ${error}`));
+          });
         });
-      });
     }
   }
 }

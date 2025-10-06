@@ -16,7 +16,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'NONE',
     execute: (state: ExecutionState, _operand: number) => {
       // Data word - no operation, just increment PC
-    }
+    },
   },
   10: {
     name: 'TAKE',
@@ -25,7 +25,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
       state.acc = state.ram[operand] || 0; // Handle undefined/null values
-    }
+    },
   },
   20: {
     name: 'ADD',
@@ -35,8 +35,9 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     execute: (state: ExecutionState, operand: number) => {
       const value = state.ram[operand] || 0; // Handle undefined/null values
       state.acc += value;
-      if (state.acc > JOHNNY_CONFIG.MAX_VALUE) state.acc = JOHNNY_CONFIG.MAX_VALUE;
-    }
+      if (state.acc > JOHNNY_CONFIG.MAX_VALUE)
+        state.acc = JOHNNY_CONFIG.MAX_VALUE;
+    },
   },
   30: {
     name: 'SUB',
@@ -47,7 +48,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       const value = state.ram[operand] || 0; // Handle undefined/null values
       state.acc -= value;
       if (state.acc < 0) state.acc = 0;
-    }
+    },
   },
   40: {
     name: 'SAVE',
@@ -56,7 +57,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
       state.ram[operand] = state.acc;
-    }
+    },
   },
   50: {
     name: 'JMP',
@@ -65,7 +66,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
       state.pc = operand; // Jump directly to the address
-    }
+    },
   },
   60: {
     name: 'TST',
@@ -76,7 +77,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       if ((state.ram[operand] || 0) === 0) {
         state.pc++; // Skip next instruction
       }
-    }
+    },
   },
   70: {
     name: 'INC',
@@ -86,7 +87,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     execute: (state: ExecutionState, operand: number) => {
       const currentValue = state.ram[operand] || 0; // Handle undefined/null values
       state.ram[operand] = (currentValue + 1) % (JOHNNY_CONFIG.MAX_VALUE + 1);
-    }
+    },
   },
   80: {
     name: 'DEC',
@@ -96,7 +97,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     execute: (state: ExecutionState, operand: number) => {
       const currentValue = state.ram[operand] || 0; // Handle undefined/null values
       state.ram[operand] = Math.max(0, currentValue - 1);
-    }
+    },
   },
   90: {
     name: 'NULL',
@@ -105,7 +106,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'ADDRESS',
     execute: (state: ExecutionState, operand: number) => {
       state.ram[operand] = 0;
-    }
+    },
   },
   100: {
     name: 'HLT',
@@ -114,8 +115,8 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
     operandType: 'NONE',
     execute: (state: ExecutionState, _operand: number) => {
       state.halted = true;
-    }
-  }
+    },
+  },
 };
 
 /**
@@ -129,7 +130,9 @@ export function loadOpcodeMapping(configPath?: string): OpcodeMapping {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       return { ...DEFAULT_OPCODE_MAPPING, ...config };
     } catch (error) {
-      console.warn(`Failed to load opcode mapping from ${configPath}, using default`);
+      console.warn(
+        `Failed to load opcode mapping from ${configPath}, using default`
+      );
     }
   }
   return DEFAULT_OPCODE_MAPPING;
@@ -138,13 +141,19 @@ export function loadOpcodeMapping(configPath?: string): OpcodeMapping {
 /**
  * Validate if an opcode is valid in the current mapping
  */
-export function isValidOpcode(opcode: number, mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING): boolean {
+export function isValidOpcode(
+  opcode: number,
+  mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING
+): boolean {
   return opcode in mapping; // All opcodes including 0 are in the mapping
 }
 
 /**
  * Get instruction name for display purposes
  */
-export function getInstructionName(opcode: number, mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING): string {
+export function getInstructionName(
+  opcode: number,
+  mapping: OpcodeMapping = DEFAULT_OPCODE_MAPPING
+): string {
   return mapping[opcode]?.name || `UNKNOWN(${opcode})`;
 }

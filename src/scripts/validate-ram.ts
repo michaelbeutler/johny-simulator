@@ -27,7 +27,8 @@ class ValidatorCLI {
       this.validateAllFiles();
     } else {
       const filePath = args[0];
-      const shouldDisassemble = args.includes('--disassemble') || args.includes('-d');
+      const shouldDisassemble =
+        args.includes('--disassemble') || args.includes('-d');
       const verbose = args.includes('--verbose') || args.includes('-v');
 
       if (!fs.existsSync(filePath)) {
@@ -35,7 +36,11 @@ class ValidatorCLI {
         process.exit(1);
       }
 
-      const isValid = this.validateSingleFile(filePath, shouldDisassemble, verbose);
+      const isValid = this.validateSingleFile(
+        filePath,
+        shouldDisassemble,
+        verbose
+      );
       process.exit(isValid ? 0 : 1);
     }
   }
@@ -48,7 +53,9 @@ class ValidatorCLI {
     console.log(chalk.gray('Usage: npm run validate <file.ram> [options]'));
     console.log(chalk.gray('Options:'));
     console.log(chalk.gray('  -d, --disassemble  Show program disassembly'));
-    console.log(chalk.gray('  -v, --verbose      Show detailed validation info'));
+    console.log(
+      chalk.gray('  -v, --verbose      Show detailed validation info')
+    );
     console.log();
   }
 
@@ -63,10 +70,17 @@ class ValidatorCLI {
       return;
     }
 
-    console.log(chalk.blue(`Found ${ramFiles.length} .ram files, validating all...\n`));
+    console.log(
+      chalk.blue(`Found ${ramFiles.length} .ram files, validating all...\n`)
+    );
 
     let allValid = true;
-    const results: Array<{ file: string; valid: boolean; errors: number; warnings: number }> = [];
+    const results: Array<{
+      file: string;
+      valid: boolean;
+      errors: number;
+      warnings: number;
+    }> = [];
 
     ramFiles.forEach(file => {
       const result = this.validateSingleFile(file, false, false);
@@ -84,7 +98,11 @@ class ValidatorCLI {
   /**
    * Validate a single file
    */
-  private validateSingleFile(filePath: string, shouldDisassemble: boolean, verbose: boolean): boolean {
+  private validateSingleFile(
+    filePath: string,
+    shouldDisassemble: boolean,
+    verbose: boolean
+  ): boolean {
     console.log(chalk.blue(`\n🔍 Validating ${path.basename(filePath)}...`));
 
     try {
@@ -93,34 +111,52 @@ class ValidatorCLI {
       // Show statistics
       if (verbose) {
         console.log(chalk.cyan(`📊 Program Statistics:`));
-        console.log(`   Instructions: ${validationResult.statistics.totalInstructions}`);
+        console.log(
+          `   Instructions: ${validationResult.statistics.totalInstructions}`
+        );
         console.log(`   Data words: ${validationResult.statistics.dataWords}`);
-        console.log(`   Max address: ${validationResult.statistics.maxAddress}`);
-        console.log(`   Has HALT: ${validationResult.statistics.hasHalt ? 'Yes' : 'No'}`);
-        
-        if (Object.keys(validationResult.statistics.instructionCount).length > 0) {
+        console.log(
+          `   Max address: ${validationResult.statistics.maxAddress}`
+        );
+        console.log(
+          `   Has HALT: ${validationResult.statistics.hasHalt ? 'Yes' : 'No'}`
+        );
+
+        if (
+          Object.keys(validationResult.statistics.instructionCount).length > 0
+        ) {
           console.log(`   Instruction breakdown:`);
-          Object.entries(validationResult.statistics.instructionCount).forEach(([opcode, count]) => {
-            const name = getInstructionName(parseInt(opcode));
-            console.log(`     ${name}: ${count}`);
-          });
+          Object.entries(validationResult.statistics.instructionCount).forEach(
+            ([opcode, count]) => {
+              const name = getInstructionName(parseInt(opcode));
+              console.log(`     ${name}: ${count}`);
+            }
+          );
         }
       }
 
       // Show errors
       if (validationResult.errors.length > 0) {
-        console.log(chalk.red(`\n❌ ${validationResult.errors.length} error(s) found:`));
+        console.log(
+          chalk.red(`\n❌ ${validationResult.errors.length} error(s) found:`)
+        );
         validationResult.errors.forEach(error => {
-          const location = error.address >= 0 ? ` at address ${error.address}` : '';
+          const location =
+            error.address >= 0 ? ` at address ${error.address}` : '';
           console.log(chalk.red(`   • ${error.message}${location}`));
         });
       }
 
       // Show warnings
       if (validationResult.warnings.length > 0) {
-        console.log(chalk.yellow(`\n⚠️  ${validationResult.warnings.length} warning(s) found:`));
+        console.log(
+          chalk.yellow(
+            `\n⚠️  ${validationResult.warnings.length} warning(s) found:`
+          )
+        );
         validationResult.warnings.forEach(warning => {
-          const location = warning.address >= 0 ? ` at address ${warning.address}` : '';
+          const location =
+            warning.address >= 0 ? ` at address ${warning.address}` : '';
           console.log(chalk.yellow(`   • ${warning.message}${location}`));
         });
       }
@@ -143,9 +179,10 @@ class ValidatorCLI {
       }
 
       return validationResult.isValid;
-
     } catch (error) {
-      console.log(chalk.red(`❌ Error validating file: ${(error as Error).message}`));
+      console.log(
+        chalk.red(`❌ Error validating file: ${(error as Error).message}`)
+      );
       return false;
     }
   }
@@ -185,16 +222,36 @@ class ValidatorCLI {
           instruction = `${opcodeInfo.name} ${operand.toString().padStart(3, '0')}`;
 
           switch (opcode) {
-            case 1: comment = `Load mem[${operand}] into ACC`; break;
-            case 2: comment = `ACC = ACC + mem[${operand}]`; break;
-            case 3: comment = `ACC = ACC - mem[${operand}]`; break;
-            case 4: comment = `mem[${operand}] = ACC`; break;
-            case 5: comment = `Jump to address ${operand}`; break;
-            case 6: comment = `Skip next if mem[${operand}] = 0`; break;
-            case 7: comment = `mem[${operand}] = mem[${operand}] + 1`; break;
-            case 8: comment = `mem[${operand}] = mem[${operand}] - 1`; break;
-            case 9: comment = `mem[${operand}] = 0`; break;
-            case 10: comment = `Halt program`; break;
+            case 1:
+              comment = `Load mem[${operand}] into ACC`;
+              break;
+            case 2:
+              comment = `ACC = ACC + mem[${operand}]`;
+              break;
+            case 3:
+              comment = `ACC = ACC - mem[${operand}]`;
+              break;
+            case 4:
+              comment = `mem[${operand}] = ACC`;
+              break;
+            case 5:
+              comment = `Jump to address ${operand}`;
+              break;
+            case 6:
+              comment = `Skip next if mem[${operand}] = 0`;
+              break;
+            case 7:
+              comment = `mem[${operand}] = mem[${operand}] + 1`;
+              break;
+            case 8:
+              comment = `mem[${operand}] = mem[${operand}] - 1`;
+              break;
+            case 9:
+              comment = `mem[${operand}] = 0`;
+              break;
+            case 10:
+              comment = `Halt program`;
+              break;
           }
         } else {
           instruction = `INVALID`;
@@ -206,9 +263,13 @@ class ValidatorCLI {
         const instrStr = instruction.padEnd(11);
 
         if (value === 0) {
-          console.log(chalk.gray(`${addrStr}  | ${valueStr} | ${instrStr} | ${comment}`));
+          console.log(
+            chalk.gray(`${addrStr}  | ${valueStr} | ${instrStr} | ${comment}`)
+          );
         } else if (opcode === 0) {
-          console.log(chalk.cyan(`${addrStr}  | ${valueStr} | ${instrStr} | ${comment}`));
+          console.log(
+            chalk.cyan(`${addrStr}  | ${valueStr} | ${instrStr} | ${comment}`)
+          );
         } else {
           console.log(`${addrStr}  | ${valueStr} | ${instrStr} | ${comment}`);
         }
@@ -216,7 +277,11 @@ class ValidatorCLI {
     }
 
     if (lastNonZero >= maxAddr) {
-      console.log(chalk.gray(`... (${lastNonZero - maxAddr + 1} more addresses with data)`));
+      console.log(
+        chalk.gray(
+          `... (${lastNonZero - maxAddr + 1} more addresses with data)`
+        )
+      );
     }
   }
 }

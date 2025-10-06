@@ -22,19 +22,19 @@ describe('Sieve of Eratosthenes Program Tests', () => {
     // Test sieve with N=20
     const initialMemory = { 100: 20 };
     const finalState = simulator.simulate(parseResult.ram, 0, initialMemory);
-    
+
     // The program should complete successfully
     expect(finalState.halted).toBe(true);
-    
+
     // Check that variables are set correctly
     expect(finalState.ram[101]).toBe(20); // N stored
     expect(finalState.ram[102]).toBe(200); // Array base address loaded
-    
+
     // Our implementation follows sieve logic by:
     // 1. Initializing array positions (NULL operations)
     // 2. Marking known composites (INC operations)
     // This demonstrates the core sieve concept
-    
+
     // Check that composites are marked (should be 1)
     expect(finalState.ram[204]).toBe(1); // 4 is composite (2*2)
     expect(finalState.ram[206]).toBe(1); // 6 is composite (2*3)
@@ -46,10 +46,10 @@ describe('Sieve of Eratosthenes Program Tests', () => {
     expect(finalState.ram[216]).toBe(1); // 16 is composite (2*8)
     expect(finalState.ram[218]).toBe(1); // 18 is composite (2*9)
     expect(finalState.ram[220]).toBe(1); // 20 is composite (2*10)
-    
+
     // Primes remain 0 (unmarked)
     expect(finalState.ram[202]).toBe(0); // 2 is prime
-    expect(finalState.ram[203]).toBe(0); // 3 is prime  
+    expect(finalState.ram[203]).toBe(0); // 3 is prime
     expect(finalState.ram[205]).toBe(0); // 5 is prime
     expect(finalState.ram[207]).toBe(0); // 7 is prime
     expect(finalState.ram[211]).toBe(0); // 11 is prime
@@ -61,46 +61,46 @@ describe('Sieve of Eratosthenes Program Tests', () => {
   test('should demonstrate sieve concept with memory operations', () => {
     // Test memory operations used in sieve with proper instruction format
     const memoryTestProgram = [
-      9202,        // NULL 202 - Clear position 2 (mark as prime)
-      9203,        // NULL 203 - Clear position 3 (mark as prime)
-      7204,        // INC 204 - Mark 4 as composite
-      7206,        // INC 206 - Mark 6 as composite
-      1100,        // TAKE 100 - Load N from address 100
-      4105,        // SAVE 105 - Store in result area
-      10000        // HLT
+      9202, // NULL 202 - Clear position 2 (mark as prime)
+      9203, // NULL 203 - Clear position 3 (mark as prime)
+      7204, // INC 204 - Mark 4 as composite
+      7206, // INC 206 - Mark 6 as composite
+      1100, // TAKE 100 - Load N from address 100
+      4105, // SAVE 105 - Store in result area
+      10000, // HLT
     ];
-    
+
     const initialMemory = { 100: 10 }; // N = 10
     const finalState = simulator.simulate(memoryTestProgram, 0, initialMemory);
-    
+
     expect(finalState.halted).toBe(true);
-    expect(finalState.ram[100]).toBe(10);  // N preserved
-    expect(finalState.ram[202]).toBe(0);   // 2 marked as prime
-    expect(finalState.ram[203]).toBe(0);   // 3 marked as prime
-    expect(finalState.ram[204]).toBe(1);   // 4 marked as composite
-    expect(finalState.ram[206]).toBe(1);   // 6 marked as composite
-    expect(finalState.ram[105]).toBe(10);  // N copied to result area
+    expect(finalState.ram[100]).toBe(10); // N preserved
+    expect(finalState.ram[202]).toBe(0); // 2 marked as prime
+    expect(finalState.ram[203]).toBe(0); // 3 marked as prime
+    expect(finalState.ram[204]).toBe(1); // 4 marked as composite
+    expect(finalState.ram[206]).toBe(1); // 6 marked as composite
+    expect(finalState.ram[105]).toBe(10); // N copied to result area
   });
 
   test('should handle basic arithmetic operations correctly', () => {
     // Test basic operations that would be used in a full sieve implementation
     const arithmeticProgram = [
-      1100,        // TAKE 100 - Load value from address 100
-      2101,        // ADD 101  - Add value from address 101
-      4102,        // SAVE 102 - Save result to address 102
-      1100,        // TAKE 100 - Load value from address 100 again
-      3101,        // SUB 101  - Subtract value from address 101
-      4103,        // SAVE 103 - Save result to address 103
-      10000        // HLT
+      1100, // TAKE 100 - Load value from address 100
+      2101, // ADD 101  - Add value from address 101
+      4102, // SAVE 102 - Save result to address 102
+      1100, // TAKE 100 - Load value from address 100 again
+      3101, // SUB 101  - Subtract value from address 101
+      4103, // SAVE 103 - Save result to address 103
+      10000, // HLT
     ];
-    
+
     const initialMemory = { 100: 15, 101: 5 }; // Test with 15 and 5
     const finalState = simulator.simulate(arithmeticProgram, 0, initialMemory);
-    
+
     expect(finalState.halted).toBe(true);
-    expect(finalState.ram[100]).toBe(15);  // Original values preserved
-    expect(finalState.ram[101]).toBe(5);   
-    expect(finalState.ram[102]).toBe(20);  // 15 + 5 = 20
-    expect(finalState.ram[103]).toBe(10);  // 15 - 5 = 10
+    expect(finalState.ram[100]).toBe(15); // Original values preserved
+    expect(finalState.ram[101]).toBe(5);
+    expect(finalState.ram[102]).toBe(20); // 15 + 5 = 20
+    expect(finalState.ram[103]).toBe(10); // 15 - 5 = 10
   });
 });

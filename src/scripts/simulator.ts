@@ -21,10 +21,10 @@ class InteractiveSimulator {
     this.simulator = new JohnnySimulator();
     this.validator = new RamValidator();
     this.parser = new RamParser();
-    
+
     this.rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
   }
 
@@ -34,10 +34,10 @@ class InteractiveSimulator {
   async start(): Promise<void> {
     console.log(chalk.blue('🖥️  JOHNNY RAM Interactive Simulator v2.0'));
     console.log(chalk.blue('='.repeat(50)));
-    
+
     await this.showHelp();
     await this.mainLoop();
-    
+
     this.rl.close();
   }
 
@@ -87,7 +87,11 @@ class InteractiveSimulator {
             return;
           default:
             if (cmd !== '') {
-              console.log(chalk.red(`Unknown command: ${cmd}. Type 'help' for available commands.`));
+              console.log(
+                chalk.red(
+                  `Unknown command: ${cmd}. Type 'help' for available commands.`
+                )
+              );
             }
         }
       } catch (error) {
@@ -111,23 +115,27 @@ class InteractiveSimulator {
     }
 
     const parseResult = this.parser.parseFile(filename);
-    
+
     if (parseResult.errors.length > 0) {
       console.log(chalk.red('Parse errors:'));
-      parseResult.errors.forEach(error => console.log(chalk.red(`  • ${error}`)));
+      parseResult.errors.forEach(error =>
+        console.log(chalk.red(`  • ${error}`))
+      );
       return;
     }
 
     this.originalRam = [...parseResult.ram];
     this.currentState = this.simulator.createInitialState(parseResult.ram);
-    
+
     console.log(chalk.green(`✅ Loaded ${filename}`));
-    
+
     if (parseResult.warnings.length > 0) {
       console.log(chalk.yellow('Warnings:'));
-      parseResult.warnings.forEach(warning => console.log(chalk.yellow(`  • ${warning}`)));
+      parseResult.warnings.forEach(warning =>
+        console.log(chalk.yellow(`  • ${warning}`))
+      );
     }
-    
+
     this.showState();
   }
 
@@ -141,27 +149,35 @@ class InteractiveSimulator {
     }
 
     if (this.currentState.halted) {
-      console.log(chalk.yellow('Program is already halted. Use "reset" to restart.'));
+      console.log(
+        chalk.yellow('Program is already halted. Use "reset" to restart.')
+      );
       return;
     }
 
     console.log(chalk.blue('🚀 Running program...'));
-    
+
     try {
       const startSteps = this.currentState.steps;
-      
+
       while (!this.currentState.halted && this.currentState.steps < 10000) {
         this.simulator.step(this.currentState);
       }
 
       const executedSteps = this.currentState.steps - startSteps;
-      
+
       if (this.currentState.halted) {
-        console.log(chalk.green(`✅ Program completed in ${executedSteps} steps`));
+        console.log(
+          chalk.green(`✅ Program completed in ${executedSteps} steps`)
+        );
       } else {
-        console.log(chalk.red(`⚠️  Program stopped after 10000 steps (possible infinite loop)`));
+        console.log(
+          chalk.red(
+            `⚠️  Program stopped after 10000 steps (possible infinite loop)`
+          )
+        );
       }
-      
+
       this.showState();
     } catch (error) {
       console.log(chalk.red(`Execution error: ${(error as Error).message}`));
@@ -185,7 +201,7 @@ class InteractiveSimulator {
     try {
       const canContinue = this.simulator.step(this.currentState);
       this.showCurrentInstruction();
-      
+
       if (!canContinue) {
         console.log(chalk.green('Program halted.'));
       }
@@ -222,7 +238,7 @@ class InteractiveSimulator {
     console.log(`   ACC: ${this.currentState.acc}`);
     console.log(`   Steps: ${this.currentState.steps}`);
     console.log(`   Halted: ${this.currentState.halted ? 'Yes' : 'No'}`);
-    
+
     if (!this.currentState.halted) {
       this.showCurrentInstruction();
     }
@@ -239,7 +255,11 @@ class InteractiveSimulator {
     const operand = instruction % 1000;
     const name = getInstructionName(opcode);
 
-    console.log(chalk.blue(`   Next: [${this.currentState.pc.toString().padStart(3, '0')}] ${instruction.toString().padStart(5, '0')} (${name} ${operand.toString().padStart(3, '0')})`));
+    console.log(
+      chalk.blue(
+        `   Next: [${this.currentState.pc.toString().padStart(3, '0')}] ${instruction.toString().padStart(5, '0')} (${name} ${operand.toString().padStart(3, '0')})`
+      )
+    );
   }
 
   /**
@@ -263,10 +283,15 @@ class InteractiveSimulator {
       if (value !== 0 || addr <= end - start + 10) {
         const opcode = Math.floor(value / 1000);
         const operand = value % 1000;
-        const instruction = opcode === 0 ? 'DATA' : `${getInstructionName(opcode)} ${operand.toString().padStart(3, '0')}`;
-        
+        const instruction =
+          opcode === 0
+            ? 'DATA'
+            : `${getInstructionName(opcode)} ${operand.toString().padStart(3, '0')}`;
+
         const marker = addr === this.currentState.pc ? '>' : ' ';
-        console.log(`${marker}${addr.toString().padStart(3, '0')} | ${value.toString().padStart(5, '0')} | ${instruction}`);
+        console.log(
+          `${marker}${addr.toString().padStart(3, '0')} | ${value.toString().padStart(5, '0')} | ${instruction}`
+        );
       }
     }
   }
@@ -287,7 +312,9 @@ class InteractiveSimulator {
     const trace = this.currentState.trace.slice(-10);
     trace.forEach(entry => {
       const name = getInstructionName(entry.opcode);
-      console.log(`${entry.step.toString().padStart(4)} | ${entry.pc.toString().padStart(3, '0')} | ${entry.instruction.toString().padStart(5, '0')} | ${name.padEnd(6)} | ${entry.acc}`);
+      console.log(
+        `${entry.step.toString().padStart(4)} | ${entry.pc.toString().padStart(3, '0')} | ${entry.instruction.toString().padStart(5, '0')} | ${name.padEnd(6)} | ${entry.acc}`
+      );
     });
   }
 
@@ -301,15 +328,19 @@ class InteractiveSimulator {
     }
 
     const result = this.validator.validateProgram(this.currentState.ram);
-    
+
     if (result.errors.length > 0) {
       console.log(chalk.red(`❌ ${result.errors.length} error(s):`));
-      result.errors.forEach(error => console.log(chalk.red(`  • ${error.message}`)));
+      result.errors.forEach(error =>
+        console.log(chalk.red(`  • ${error.message}`))
+      );
     }
 
     if (result.warnings.length > 0) {
       console.log(chalk.yellow(`⚠️  ${result.warnings.length} warning(s):`));
-      result.warnings.forEach(warning => console.log(chalk.yellow(`  • ${warning.message}`)));
+      result.warnings.forEach(warning =>
+        console.log(chalk.yellow(`  • ${warning.message}`))
+      );
     }
 
     if (result.isValid && result.warnings.length === 0) {

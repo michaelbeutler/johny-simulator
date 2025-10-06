@@ -24,7 +24,7 @@ describe('Multiplication Program Tests', () => {
 
     expect(finalState.halted).toBe(true);
     expect(finalState.ram[102]).toBe(12); // Result should be 12
-    expect(finalState.ram[101]).toBe(0);  // Multiplier should be 0
+    expect(finalState.ram[101]).toBe(0); // Multiplier should be 0
     expect(finalState.steps).toBeGreaterThan(0);
   });
 

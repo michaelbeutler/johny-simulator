@@ -1,12 +1,20 @@
 // JOHNNY RAM Simulator - Core execution engine
-import { ExecutionState, ExecutionTrace, SimulationConfig, OpcodeMapping } from '../types';
+import {
+  ExecutionState,
+  ExecutionTrace,
+  SimulationConfig,
+  OpcodeMapping,
+} from '../types';
 import { DEFAULT_OPCODE_MAPPING, JOHNNY_CONFIG } from './opcodes';
 
 export class JohnnySimulator {
   private opcodeMapping: OpcodeMapping;
   private config: SimulationConfig;
 
-  constructor(opcodeMapping?: OpcodeMapping, config?: Partial<SimulationConfig>) {
+  constructor(
+    opcodeMapping?: OpcodeMapping,
+    config?: Partial<SimulationConfig>
+  ) {
     this.opcodeMapping = opcodeMapping || DEFAULT_OPCODE_MAPPING;
     this.config = {
       maxSteps: JOHNNY_CONFIG.MAX_STEPS,
@@ -14,14 +22,18 @@ export class JohnnySimulator {
       maxValue: JOHNNY_CONFIG.MAX_VALUE,
       enableTrace: true,
       validateInstructions: true,
-      ...config
+      ...config,
     };
   }
 
   /**
    * Create initial execution state
    */
-  createInitialState(ram: number[], initialAcc: number = 0, initialMemory?: Record<number, number>): ExecutionState {
+  createInitialState(
+    ram: number[],
+    initialAcc: number = 0,
+    initialMemory?: Record<number, number>
+  ): ExecutionState {
     const state: ExecutionState = {
       pc: 0,
       acc: initialAcc,
@@ -31,7 +43,7 @@ export class JohnnySimulator {
       steps: 0,
       halted: false,
       ram: [...ram],
-      trace: []
+      trace: [],
     };
 
     // Apply initial memory values
@@ -54,7 +66,7 @@ export class JohnnySimulator {
     if (state.halted || state.pc >= this.config.memorySize) {
       return;
     }
-    
+
     if (state.pc < 0) {
       state.halted = true;
       throw new Error(`Program counter went out of bounds: ${state.pc}`);
@@ -67,7 +79,11 @@ export class JohnnySimulator {
     const operand = (instruction || 0) % 1000;
 
     // Validate instruction if enabled
-    if (this.config.validateInstructions && opcode > 0 && !this.opcodeMapping[opcode]) {
+    if (
+      this.config.validateInstructions &&
+      opcode > 0 &&
+      !this.opcodeMapping[opcode]
+    ) {
       throw new Error(`Invalid opcode ${opcode} at address ${state.pc}`);
     }
 
@@ -79,7 +95,7 @@ export class JohnnySimulator {
         instruction: instruction,
         opcode: opcode,
         operand: operand,
-        acc: state.acc
+        acc: state.acc,
       };
       state.trace.push(trace);
     }
@@ -95,14 +111,20 @@ export class JohnnySimulator {
       state.pc++;
     } else if (this.opcodeMapping[opcode]) {
       const opcodeInfo = this.opcodeMapping[opcode];
-      
+
       // Validate operand for address-based instructions
-      if (opcodeInfo.operandType === 'ADDRESS' && (operand < 0 || operand >= this.config.memorySize)) {
-        throw new Error(`Invalid address operand ${operand} for ${opcodeInfo.name} at address ${state.pc}`);
+      if (
+        opcodeInfo.operandType === 'ADDRESS' &&
+        (operand < 0 || operand >= this.config.memorySize)
+      ) {
+        throw new Error(
+          `Invalid address operand ${operand} for ${opcodeInfo.name} at address ${state.pc}`
+        );
       }
 
       // Record memory state before execution for trace
-      const oldRamValue = opcodeInfo.operandType === 'ADDRESS' ? state.ram[operand] : 0;
+      const oldRamValue =
+        opcodeInfo.operandType === 'ADDRESS' ? state.ram[operand] : 0;
 
       // Execute the instruction
       opcodeInfo.execute(state, operand);
@@ -115,13 +137,14 @@ export class JohnnySimulator {
           lastTrace.ramChanged = {
             address: operand,
             oldValue: oldRamValue,
-            newValue: newRamValue
+            newValue: newRamValue,
           };
         }
       }
 
       // Increment PC (unless instruction already modified it, like JMP)
-      if (opcode !== 50) { // JMP handles PC itself
+      if (opcode !== 50) {
+        // JMP handles PC itself
         state.pc++;
       }
     } else {
@@ -134,7 +157,11 @@ export class JohnnySimulator {
   /**
    * Run program until halt or max steps reached
    */
-  simulate(ram: number[], initialAcc: number = 0, initialMemory?: Record<number, number>): ExecutionState {
+  simulate(
+    ram: number[],
+    initialAcc: number = 0,
+    initialMemory?: Record<number, number>
+  ): ExecutionState {
     const state = this.createInitialState(ram, initialAcc, initialMemory);
 
     while (!state.halted && state.steps < this.config.maxSteps) {
@@ -142,12 +169,16 @@ export class JohnnySimulator {
         this.executeInstruction(state);
       } catch (error) {
         state.halted = true;
-        throw new Error(`Execution error at step ${state.steps}, PC ${state.pc}: ${(error as Error).message}`);
+        throw new Error(
+          `Execution error at step ${state.steps}, PC ${state.pc}: ${(error as Error).message}`
+        );
       }
     }
 
     if (!state.halted && state.steps >= this.config.maxSteps) {
-      throw new Error(`Program exceeded maximum steps (${this.config.maxSteps}), possible infinite loop`);
+      throw new Error(
+        `Program exceeded maximum steps (${this.config.maxSteps}), possible infinite loop`
+      );
     }
 
     return state;

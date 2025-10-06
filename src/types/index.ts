@@ -8,14 +8,14 @@ export interface JohnnyInstruction {
 }
 
 export interface ExecutionState {
-  pc: number;          // Program Counter
-  acc: number;         // Accumulator
-  addressBus: number;  // Address Bus
-  dataBus: number;     // Data Bus
+  pc: number; // Program Counter
+  acc: number; // Accumulator
+  addressBus: number; // Address Bus
+  dataBus: number; // Data Bus
   instruction: number; // Current Instruction
-  steps: number;       // Execution Steps
-  halted: boolean;     // Halt State
-  ram: number[];       // RAM Memory
+  steps: number; // Execution Steps
+  halted: boolean; // Halt State
+  ram: number[]; // RAM Memory
   trace: ExecutionTrace[];
 }
 

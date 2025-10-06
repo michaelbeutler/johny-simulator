@@ -36,21 +36,21 @@ class DocumentationGenerator {
   async generateDocs(): Promise<void> {
     console.log('🔍 Scanning for .ram files...');
     const ramFiles = this.findRamFiles();
-    
+
     const analyses: ProgramAnalysis[] = [];
-    
+
     for (const file of ramFiles) {
       console.log(`📋 Analyzing ${file}...`);
       const analysis = await this.analyzeProgram(file);
       analyses.push(analysis);
-      
+
       // Generate individual .md file
       await this.generateIndividualDoc(analysis);
     }
-    
+
     // Generate master README
     await this.generateMasterDoc(analyses);
-    
+
     console.log(`✅ Generated documentation for ${analyses.length} programs`);
   }
 
@@ -67,20 +67,20 @@ class DocumentationGenerator {
 
   private async analyzeProgram(filePath: string): Promise<ProgramAnalysis> {
     const filename = basename(filePath);
-    
+
     try {
       // Validate program
       const validationResult = this.validator.validateFile(filePath);
-      
+
       // Parse program
       const parseResult = this.parser.parseFile(filePath);
-      
+
       // Generate disassembly
       const disassembly = this.generateDisassembly(parseResult.ram);
-      
+
       // Check for test results
       const testResults = await this.getTestResults(filename);
-      
+
       return {
         filename,
         valid: validationResult.isValid,
@@ -90,10 +90,10 @@ class DocumentationGenerator {
           instructions: validationResult.statistics.totalInstructions,
           dataWords: validationResult.statistics.dataWords,
           maxAddress: validationResult.statistics.maxAddress,
-          hasHalt: validationResult.statistics.hasHalt
+          hasHalt: validationResult.statistics.hasHalt,
         },
         disassembly,
-        testResults
+        testResults,
       };
     } catch (error) {
       return {
@@ -109,7 +109,7 @@ class DocumentationGenerator {
 
   private generateDisassembly(ram: number[]): string[] {
     const lines: string[] = [];
-    
+
     // Find last non-zero address
     let lastAddr = 0;
     for (let i = 999; i >= 0; i--) {
@@ -118,9 +118,9 @@ class DocumentationGenerator {
         break;
       }
     }
-    
+
     const maxShow = Math.min(Math.max(lastAddr + 5, 20), 100);
-    
+
     for (let addr = 0; addr <= maxShow; addr++) {
       const value = ram[addr];
       if (value !== 0 || addr <= lastAddr + 2) {
@@ -128,10 +128,10 @@ class DocumentationGenerator {
         const opcodeDigits = parseInt(valueStr.slice(0, 2), 10);
         const opcode = opcodeDigits * 10; // Convert to actual opcode (01 -> 10, 02 -> 20, etc.)
         const operand = valueStr.slice(2);
-        
+
         let instruction: string;
         let comment: string;
-        
+
         if (opcodeDigits === 0 && value > 0) {
           instruction = 'DATA';
           comment = `Value: ${value}`;
@@ -143,80 +143,102 @@ class DocumentationGenerator {
           instruction = `${name} ${operand}`;
           comment = this.getInstructionComment(opcode, parseInt(operand, 10));
         }
-        
-        lines.push(`${addr.toString().padStart(3, '0')} | ${valueStr} | ${instruction.padEnd(12)} | ${comment}`);
+
+        lines.push(
+          `${addr.toString().padStart(3, '0')} | ${valueStr} | ${instruction.padEnd(12)} | ${comment}`
+        );
       }
     }
-    
+
     return lines;
   }
 
   private getInstructionComment(opcode: number, operand: number): string {
     switch (opcode) {
-      case 10: return `Load mem[${operand}] into ACC`;
-      case 20: return `ACC = ACC + mem[${operand}]`;
-      case 30: return `ACC = ACC - mem[${operand}]`;
-      case 40: return `mem[${operand}] = ACC`;
-      case 50: return `Jump to address ${operand}`;
-      case 60: return `Skip next if mem[${operand}] = 0`;
-      case 70: return `mem[${operand}] = mem[${operand}] + 1`;
-      case 80: return `mem[${operand}] = mem[${operand}] - 1`;
-      case 90: return `mem[${operand}] = 0`;
-      case 100: return `Halt program`;
-      default: return `Unknown instruction`;
+      case 10:
+        return `Load mem[${operand}] into ACC`;
+      case 20:
+        return `ACC = ACC + mem[${operand}]`;
+      case 30:
+        return `ACC = ACC - mem[${operand}]`;
+      case 40:
+        return `mem[${operand}] = ACC`;
+      case 50:
+        return `Jump to address ${operand}`;
+      case 60:
+        return `Skip next if mem[${operand}] = 0`;
+      case 70:
+        return `mem[${operand}] = mem[${operand}] + 1`;
+      case 80:
+        return `mem[${operand}] = mem[${operand}] - 1`;
+      case 90:
+        return `mem[${operand}] = 0`;
+      case 100:
+        return `Halt program`;
+      default:
+        return `Unknown instruction`;
     }
   }
 
-  private async getTestResults(filename: string): Promise<{ passed: number; failed: number; total: number; descriptions: string[] } | undefined> {
+  private async getTestResults(
+    filename: string
+  ): Promise<
+    | { passed: number; failed: number; total: number; descriptions: string[] }
+    | undefined
+  > {
     const testFile = filename.replace('.ram', '.test.ts');
     const testPath = join('scripts', testFile);
-    
+
     try {
       // Read and parse test file to extract descriptions
       const testContent = readFileSync(testPath, 'utf-8');
       const descriptions = this.extractTestDescriptions(testContent);
-      
+
       // For now, assume all tests pass (since we know they do from manual testing)
       // In a production system, you'd integrate with the test runner API
       const total = descriptions.length;
       const passed = total; // Assume all pass since our tests are working
       const failed = 0;
-      
+
       return { passed, failed, total, descriptions };
     } catch {
       return undefined;
     }
   }
 
-  private async generateIndividualDoc(analysis: ProgramAnalysis): Promise<void> {
+  private async generateIndividualDoc(
+    analysis: ProgramAnalysis
+  ): Promise<void> {
     const baseName = analysis.filename.replace('.ram', '');
     const docPath = join('scripts', `${baseName}.md`);
-    
+
     // Check if existing file has placeholder comment
     let existingUserContent = '';
     try {
       const existingContent = readFileSync(docPath, 'utf8');
-      const placeholderMatch = existingContent.match(/([\s\S]*?)<!-- AUTO_GENERATED_DOCS_START -->/);
+      const placeholderMatch = existingContent.match(
+        /([\s\S]*?)<!-- AUTO_GENERATED_DOCS_START -->/
+      );
       if (placeholderMatch) {
         existingUserContent = placeholderMatch[1].trim() + '\n\n';
       }
     } catch (error) {
       // File doesn't exist or can't be read - create new
     }
-    
+
     // Generate auto-docs content
     let autoContent = `<!-- AUTO_GENERATED_DOCS_START -->\n`;
     autoContent += `<!-- Everything below this line will be replaced by auto-generated documentation -->\n\n`;
-    
+
     // Status badge
     const statusBadge = analysis.valid ? '✅ VALID' : '❌ INVALID';
     autoContent += `**Status:** ${statusBadge}\n\n`;
-    
+
     // Test results
     if (analysis.testResults) {
       const testBadge = analysis.testResults.failed === 0 ? '✅' : '❌';
       autoContent += `**Tests:** ${testBadge} ${analysis.testResults.passed}/${analysis.testResults.total} passed\n\n`;
-      
+
       // Add test descriptions
       if (analysis.testResults.descriptions.length > 0) {
         autoContent += `## 🧪 Test Cases\n\n`;
@@ -227,14 +249,14 @@ class DocumentationGenerator {
         autoContent += `\n`;
       }
     }
-    
+
     // Program statistics
     autoContent += `## Program Statistics\n\n`;
     autoContent += `- **Instructions:** ${analysis.stats.instructions}\n`;
     autoContent += `- **Data Words:** ${analysis.stats.dataWords}\n`;
     autoContent += `- **Memory Used:** 0-${analysis.stats.maxAddress}\n`;
     autoContent += `- **Has HALT:** ${analysis.stats.hasHalt ? 'Yes' : 'No'}\n\n`;
-    
+
     // Errors and warnings
     if (analysis.errors.length > 0) {
       autoContent += `## ❌ Errors\n\n`;
@@ -243,7 +265,7 @@ class DocumentationGenerator {
       });
       autoContent += `\n`;
     }
-    
+
     if (analysis.warnings.length > 0) {
       autoContent += `## ⚠️ Warnings\n\n`;
       analysis.warnings.forEach(warning => {
@@ -251,7 +273,7 @@ class DocumentationGenerator {
       });
       autoContent += `\n`;
     }
-    
+
     // Disassembly
     autoContent += `## 📋 Program Disassembly\n\n`;
     autoContent += `\`\`\`\n`;
@@ -261,10 +283,13 @@ class DocumentationGenerator {
       autoContent += `${line}\n`;
     });
     autoContent += `\`\`\`\n\n`;
-    
+
     // Source code
     try {
-      const sourceCode = readFileSync(join('scripts', analysis.filename), 'utf8');
+      const sourceCode = readFileSync(
+        join('scripts', analysis.filename),
+        'utf8'
+      );
       autoContent += `## 💾 Source Code\n\n`;
       autoContent += `\`\`\`\n`;
       autoContent += sourceCode;
@@ -272,7 +297,7 @@ class DocumentationGenerator {
     } catch (error) {
       autoContent += `## 💾 Source Code\n\n*Could not read source file*\n`;
     }
-    
+
     // Combine user content with auto-generated content
     let finalContent;
     if (existingUserContent) {
@@ -281,7 +306,7 @@ class DocumentationGenerator {
       // No existing content or placeholder - create default header
       finalContent = `# ${baseName.toUpperCase()} Program\n\n${autoContent}`;
     }
-    
+
     writeFileSync(docPath, finalContent);
     console.log(`📝 Generated ${docPath}`);
   }
@@ -289,34 +314,37 @@ class DocumentationGenerator {
   private async generateMasterDoc(analyses: ProgramAnalysis[]): Promise<void> {
     let content = `# JOHNNY RAM Programs\n\n`;
     content += `*Auto-generated documentation*\n\n`;
-    
+
     // Summary statistics
     const totalPrograms = analyses.length;
     const validPrograms = analyses.filter(a => a.valid).length;
-    const totalInstructions = analyses.reduce((sum, a) => sum + a.stats.instructions, 0);
-    
+    const totalInstructions = analyses.reduce(
+      (sum, a) => sum + a.stats.instructions,
+      0
+    );
+
     content += `## 📊 Summary\n\n`;
     content += `- **Total Programs:** ${totalPrograms}\n`;
     content += `- **Valid Programs:** ${validPrograms}/${totalPrograms}\n`;
     content += `- **Total Instructions:** ${totalInstructions}\n\n`;
-    
+
     // Program list
     content += `## 📁 Programs\n\n`;
     content += `| Program | Status | Instructions | Tests | Description |\n`;
     content += `|---------|--------|--------------|-------|-------------|\n`;
-    
+
     analyses.forEach(analysis => {
       const name = analysis.filename.replace('.ram', '');
       const status = analysis.valid ? '✅' : '❌';
       const instructions = analysis.stats.instructions;
-      const tests = analysis.testResults 
-        ? `${analysis.testResults.passed}/${analysis.testResults.total}` 
+      const tests = analysis.testResults
+        ? `${analysis.testResults.passed}/${analysis.testResults.total}`
         : 'N/A';
       const docLink = `[${name}](scripts/${name}.md)`;
-      
+
       content += `| ${docLink} | ${status} | ${instructions} | ${tests} | *Auto-generated* |\n`;
     });
-    
+
     content += `\n## 🛠️ JOHNNY Instruction Set\n\n`;
     content += `| Opcode | Name | Description |\n`;
     content += `|--------|------|-------------|\n`;
@@ -331,7 +359,7 @@ class DocumentationGenerator {
     content += `| 08 | DEC | mem[addr] = mem[addr] - 1 |\n`;
     content += `| 09 | NULL | mem[addr] = 0 |\n`;
     content += `| 10 | HLT | Halt program |\n`;
-    
+
     writeFileSync('PROGRAMS.md', content);
     console.log(`📝 Generated PROGRAMS.md`);
   }
@@ -343,11 +371,11 @@ class DocumentationGenerator {
     const descriptions: string[] = [];
     const testRegex = /test\(['"](.*?)['"]\s*,/g;
     let match;
-    
+
     while ((match = testRegex.exec(testContent)) !== null) {
       descriptions.push(match[1]);
     }
-    
+
     return descriptions;
   }
 
@@ -355,7 +383,11 @@ class DocumentationGenerator {
    * Parse test runner output to extract pass/fail counts
    * Note: This is simplified for demo purposes - in production you'd integrate with test runner API
    */
-  private parseTestOutput(output: string): { passed: number; failed: number; total: number } {
+  private parseTestOutput(output: string): {
+    passed: number;
+    failed: number;
+    total: number;
+  } {
     // Placeholder method - actual results are determined above
     return { passed: 0, failed: 0, total: 0 };
   }

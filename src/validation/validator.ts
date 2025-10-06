@@ -1,6 +1,17 @@
 // JOHNNY RAM Program Validator with improved syntax checking
-import { ValidationResult, ValidationError, ValidationWarning, ProgramStatistics, OpcodeMapping } from '../types';
-import { DEFAULT_OPCODE_MAPPING, JOHNNY_CONFIG, isValidOpcode, getInstructionName } from '../core/opcodes';
+import {
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ProgramStatistics,
+  OpcodeMapping,
+} from '../types';
+import {
+  DEFAULT_OPCODE_MAPPING,
+  JOHNNY_CONFIG,
+  isValidOpcode,
+  getInstructionName,
+} from '../core/opcodes';
 import { RamParser } from '../core/parser';
 
 export class RamValidator {
@@ -17,21 +28,21 @@ export class RamValidator {
    */
   validateFile(filePath: string): ValidationResult {
     const parseResult = this.parser.parseFile(filePath);
-    
+
     if (parseResult.errors.length > 0) {
       return {
         isValid: false,
         errors: parseResult.errors.map(msg => ({
           type: 'SYNTAX' as const,
           address: -1,
-          message: msg
+          message: msg,
         })),
         warnings: parseResult.warnings.map(msg => ({
           type: 'STYLE' as const,
           address: -1,
-          message: msg
+          message: msg,
         })),
-        statistics: this.createEmptyStatistics()
+        statistics: this.createEmptyStatistics(),
       };
     }
 
@@ -41,7 +52,10 @@ export class RamValidator {
   /**
    * Validate a RAM program from memory array
    */
-  validateProgram(ram: number[], lineMapping?: Map<number, number>): ValidationResult {
+  validateProgram(
+    ram: number[],
+    lineMapping?: Map<number, number>
+  ): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
     const statistics = this.calculateStatistics(ram);
@@ -61,7 +75,7 @@ export class RamValidator {
           type: 'SYNTAX',
           address: addr,
           message: `Value ${value} outside valid range 0..${JOHNNY_CONFIG.MAX_VALUE}`,
-          instruction: value
+          instruction: value,
         });
         continue;
       }
@@ -75,7 +89,7 @@ export class RamValidator {
           type: 'SYNTAX',
           address: addr,
           message: `Invalid opcode ${opcode.toString().padStart(2, '0')}`,
-          instruction: value
+          instruction: value,
         });
         continue;
       }
@@ -94,16 +108,23 @@ export class RamValidator {
       isValid: errors.length === 0,
       errors,
       warnings,
-      statistics
+      statistics,
     };
   }
 
   /**
    * Validate instruction operand
    */
-  private validateOperand(opcode: number, operand: number, address: number, instruction: number, errors: ValidationError[], warnings: ValidationWarning[]): void {
+  private validateOperand(
+    opcode: number,
+    operand: number,
+    address: number,
+    instruction: number,
+    errors: ValidationError[],
+    warnings: ValidationWarning[]
+  ): void {
     const opcodeInfo = this.opcodeMapping[opcode];
-    
+
     if (!opcodeInfo) return;
 
     // Instructions 10-90 require valid address operands (000-999)
@@ -113,7 +134,7 @@ export class RamValidator {
           type: 'SYNTAX',
           address: address,
           message: `Invalid address operand ${operand.toString().padStart(3, '0')} for ${opcodeInfo.name}`,
-          instruction: instruction
+          instruction: instruction,
         });
       }
     }
@@ -124,7 +145,9 @@ export class RamValidator {
         type: 'STYLE',
         address: address,
         message: `HLT instruction ignores operand; received ${operand.toString().padStart(3, '0')}`,
-        instruction: parseInt(`${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`)
+        instruction: parseInt(
+          `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
+        ),
       });
     }
   }
@@ -153,7 +176,7 @@ export class RamValidator {
       } else {
         totalInstructions++;
         instructionCount[opcode] = (instructionCount[opcode] || 0) + 1;
-        
+
         if (opcode === 10) {
           hasHalt = true;
         }
@@ -172,14 +195,20 @@ export class RamValidator {
       hasHalt,
       maxAddress,
       dataWords,
-      potentialInfiniteLoops
+      potentialInfiniteLoops,
     };
   }
 
   /**
    * Check for potential logic issues
    */
-  private checkLogicIssues(opcode: number, operand: number, address: number, ram: number[], warnings: ValidationWarning[]): void {
+  private checkLogicIssues(
+    opcode: number,
+    operand: number,
+    address: number,
+    ram: number[],
+    warnings: ValidationWarning[]
+  ): void {
     // Check for JMP to same address (only warn if no HLT in program)
     if (opcode === 5 && operand === address) {
       const hasHalt = this.programHasHalt(ram);
@@ -188,14 +217,18 @@ export class RamValidator {
           type: 'SAFETY',
           address: address,
           message: `JMP to same address ${address} without HALT instruction - potential infinite loop`,
-          instruction: parseInt(`${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`)
+          instruction: parseInt(
+            `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
+          ),
         });
       } else {
         warnings.push({
           type: 'PERFORMANCE',
           address: address,
           message: `JMP to same address ${address} - active waiting loop`,
-          instruction: parseInt(`${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`)
+          instruction: parseInt(
+            `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
+          ),
         });
       }
     }
@@ -204,13 +237,18 @@ export class RamValidator {
   /**
    * Validate overall program structure
    */
-  private validateProgramStructure(ram: number[], statistics: ProgramStatistics, warnings: ValidationWarning[]): void {
+  private validateProgramStructure(
+    ram: number[],
+    statistics: ProgramStatistics,
+    warnings: ValidationWarning[]
+  ): void {
     // Check for HALT instruction
     if (!statistics.hasHalt) {
       warnings.push({
         type: 'SAFETY',
         address: -1,
-        message: 'Program does not contain a HALT instruction - may run indefinitely'
+        message:
+          'Program does not contain a HALT instruction - may run indefinitely',
       });
     }
   }
@@ -236,7 +274,7 @@ export class RamValidator {
       hasHalt: false,
       maxAddress: 0,
       dataWords: 0,
-      potentialInfiniteLoops: 0
+      potentialInfiniteLoops: 0,
     };
   }
 }

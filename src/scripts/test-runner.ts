@@ -21,9 +21,11 @@ export class TestRunner {
     console.log(chalk.blue('='.repeat(50)));
 
     const testCases = this.loadTestCases();
-    
+
     if (testCases.length === 0) {
-      console.log(chalk.yellow('No test cases found. Creating sample tests...'));
+      console.log(
+        chalk.yellow('No test cases found. Creating sample tests...')
+      );
       this.createSampleTests();
       return;
     }
@@ -43,10 +45,10 @@ export class TestRunner {
 
     // Load basic test programs
     testCases.push(...this.loadBasicTests());
-    
+
     // Load multiplication tests
     testCases.push(...this.loadMultiplicationTests());
-    
+
     // Load arithmetic tests
     testCases.push(...this.loadArithmeticTests());
 
@@ -69,14 +71,14 @@ export class TestRunner {
           {
             type: 'HALT',
             expectedValue: 1,
-            description: 'Program should halt'
+            description: 'Program should halt',
           },
           {
             type: 'STEPS',
             expectedRange: { min: 1, max: 5 },
-            description: 'Should complete in few steps'
-          }
-        ]
+            description: 'Should complete in few steps',
+          },
+        ],
       });
     }
 
@@ -87,21 +89,21 @@ export class TestRunner {
         description: 'Test TAKE and SAVE instructions',
         ramFile: 'loadsave.ram',
         setup: {
-          initialMemory: { 100: 42 }
+          initialMemory: { 100: 42 },
         },
         expectedResults: [
           {
             type: 'MEMORY',
             address: 101,
             expectedValue: 42,
-            description: 'Value should be copied from address 100 to 101'
+            description: 'Value should be copied from address 100 to 101',
           },
           {
             type: 'HALT',
             expectedValue: 1,
-            description: 'Program should halt'
-          }
-        ]
+            description: 'Program should halt',
+          },
+        ],
       });
     }
 
@@ -121,33 +123,37 @@ export class TestRunner {
         { a: 7, b: 8, result: 56 },
         { a: 0, b: 5, result: 0 },
         { a: 1, b: 100, result: 100 },
-        { a: 12, b: 12, result: 144 }
+        { a: 12, b: 12, result: 144 },
       ];
 
       multiplyTests.forEach(({ a, b, result }) => {
-        tests.push(this.framework.createMultiplicationTest(
-          `Multiply ${a} × ${b}`,
-          'multiply.ram',
-          a,
-          b,
-          102, // Result address
-          100, // Multiplicand address
-          101  // Multiplier address
-        ));
+        tests.push(
+          this.framework.createMultiplicationTest(
+            `Multiply ${a} × ${b}`,
+            'multiply.ram',
+            a,
+            b,
+            102, // Result address
+            100, // Multiplicand address
+            101 // Multiplier address
+          )
+        );
       });
     }
 
     // Test multiplication by zero
     if (fs.existsSync('multiply.ram')) {
-      tests.push(this.framework.createMultiplicationTest(
-        'Multiply by Zero',
-        'multiply.ram',
-        15,
-        0,
-        102,
-        100,
-        101
-      ));
+      tests.push(
+        this.framework.createMultiplicationTest(
+          'Multiply by Zero',
+          'multiply.ram',
+          15,
+          0,
+          102,
+          100,
+          101
+        )
+      );
     }
 
     return tests;
@@ -165,20 +171,20 @@ export class TestRunner {
         description: 'Test ADD and SUB instructions',
         ramFile: 'arithmetic.ram',
         setup: {
-          initialMemory: { 100: 10, 101: 5 }
+          initialMemory: { 100: 10, 101: 5 },
         },
         expectedResults: [
           {
             type: 'ACCUMULATOR',
             expectedValue: 15,
-            description: 'ACC should contain 10 + 5'
+            description: 'ACC should contain 10 + 5',
           },
           {
             type: 'HALT',
             expectedValue: 1,
-            description: 'Program should halt'
-          }
-        ]
+            description: 'Program should halt',
+          },
+        ],
       });
     }
 
@@ -189,27 +195,27 @@ export class TestRunner {
         description: 'Test countdown from 10 to 0',
         ramFile: 'countdown.ram',
         setup: {
-          initialMemory: { 100: 10 }
+          initialMemory: { 100: 10 },
         },
         expectedResults: [
           {
             type: 'MEMORY',
             address: 100,
             expectedValue: 0,
-            description: 'Counter should reach 0'
+            description: 'Counter should reach 0',
           },
           {
             type: 'STEPS',
             expectedRange: { min: 20, max: 50 },
-            description: 'Should complete countdown in reasonable steps'
+            description: 'Should complete countdown in reasonable steps',
           },
           {
             type: 'HALT',
             expectedValue: 1,
-            description: 'Program should halt'
-          }
+            description: 'Program should halt',
+          },
         ],
-        timeout: 1000
+        timeout: 1000,
       });
     }
 
@@ -253,8 +259,16 @@ export class TestRunner {
       console.log(chalk.green('✅ Created test-add.ram'));
     }
 
-    console.log(chalk.blue('\n🧪 Sample test programs created. Run again to execute tests.'));
-    console.log(chalk.gray('Edit the .ram files to set up your test data and expected results.'));
+    console.log(
+      chalk.blue(
+        '\n🧪 Sample test programs created. Run again to execute tests.'
+      )
+    );
+    console.log(
+      chalk.gray(
+        'Edit the .ram files to set up your test data and expected results.'
+      )
+    );
   }
 }
 
