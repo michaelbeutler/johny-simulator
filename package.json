@@ -8,6 +8,7 @@
     "test:watch": "bun test --watch",
     "validate": "bun run src/scripts/validate-ram.ts",
     "simulate": "bun run src/scripts/simulator.ts",
+    "compile": "bun run src/compiler/cli.ts",
     "docs": "bun run src/scripts/generate-docs.ts",
     "clean": "rm -rf dist *.md",
     "dev": "bun test --watch",
@@ -46,9 +47,11 @@
     "husky": "^8.0.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@types/bun": "latest"
   },
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "private": true
 }

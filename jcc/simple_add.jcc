@@ -1,0 +1,9 @@
+// Simple addition test program
+int x; // Declare variable x
+int y;
+int result;
+
+x = 3;
+y = 4;
+result = x + y;
+halt;
