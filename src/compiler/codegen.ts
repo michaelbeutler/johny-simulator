@@ -42,20 +42,34 @@ export class CodeGenerator {
 
     // Generate code for each block
     for (const block of blocks) {
-      // Add block label
-      instructions.push({
-        opcode: 0, // DATA
-        operand: 0,
-        label: block.name,
-        comment: `Block: ${block.name}`,
-      });
-
       // Reset temp allocator for each block
       this.tempAllocator.clear();
 
       // Generate instructions for the block
+      let isFirstInstruction = true;
       for (const instr of block.instructions) {
+        const beforeCount = instructions.length;
         this.generateInstruction(instr, instructions, memoryMap);
+
+        // Attach block label to first real instruction generated
+        if (isFirstInstruction && instructions.length > beforeCount) {
+          instructions[beforeCount].label = block.name;
+          instructions[beforeCount].comment = instructions[beforeCount].comment
+            ? `${block.name}: ${instructions[beforeCount].comment}`
+            : `Block: ${block.name}`;
+          isFirstInstruction = false;
+        }
+      }
+
+      // If block had no instructions, we need a placeholder
+      if (isFirstInstruction && block.instructions.length === 0) {
+        // Add a NOP only if the block is empty
+        instructions.push({
+          opcode: 0, // NOP/DATA
+          operand: 0,
+          label: block.name,
+          comment: `Empty block: ${block.name}`,
+        });
       }
     }
 
