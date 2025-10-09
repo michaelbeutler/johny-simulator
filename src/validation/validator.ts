@@ -152,7 +152,7 @@ export class RamValidator {
         type: 'STYLE',
         address: address,
         message: `HLT instruction ignores operand; received ${operand.toString().padStart(3, '0')}`,
-        instruction: parseInt(
+        instruction: Number.parseInt(
           `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
         ),
       });
@@ -224,7 +224,7 @@ export class RamValidator {
           type: 'SAFETY',
           address: address,
           message: `JMP to same address ${address} without HALT instruction - potential infinite loop`,
-          instruction: parseInt(
+          instruction: Number.parseInt(
             `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
           ),
         });
@@ -233,7 +233,7 @@ export class RamValidator {
           type: 'PERFORMANCE',
           address: address,
           message: `JMP to same address ${address} - active waiting loop`,
-          instruction: parseInt(
+          instruction: Number.parseInt(
             `${opcode.toString().padStart(2, '0')}${operand.toString().padStart(3, '0')}`
           ),
         });

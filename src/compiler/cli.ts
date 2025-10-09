@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Johnny C Compiler CLI - Entry point
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve, dirname, basename, extname } from 'path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve, dirname, basename, extname } from 'node:path';
 import { Parser, ParseError } from './parser';
 import { IRGenerator, Symbol } from './ir';
 import { MemoryMapper, DEFAULT_LAYOUT, MemoryMap } from './memmap';
@@ -20,7 +20,7 @@ export interface CompilerOptions {
 }
 
 export class JohnnyCompiler {
-  private memoryMapper: MemoryMapper;
+  private readonly memoryMapper: MemoryMapper;
 
   constructor() {
     this.memoryMapper = new MemoryMapper(DEFAULT_LAYOUT);

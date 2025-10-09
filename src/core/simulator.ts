@@ -49,7 +49,7 @@ export class JohnnySimulator {
     // Apply initial memory values
     if (initialMemory) {
       Object.entries(initialMemory).forEach(([addr, value]) => {
-        const address = parseInt(addr);
+        const address = Number.parseInt(addr);
         if (address >= 0 && address < this.config.memorySize) {
           state.ram[address] = value;
         }

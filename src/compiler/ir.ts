@@ -92,11 +92,7 @@ export class IRConditionalJump extends IRInstruction {
   }
 }
 
-export class IRHalt extends IRInstruction {
-  constructor(id: number) {
-    super(id);
-  }
-}
+export class IRHalt extends IRInstruction {}
 
 // Basic Block for control flow
 export class BasicBlock {
@@ -129,8 +125,8 @@ export class IRGenerator {
   private nextInstrId = 0;
   private nextTempId = 0;
   private nextLabelId = 0;
-  private symbols = new Map<string, Symbol>();
-  private blocks: BasicBlock[] = [];
+  private readonly symbols = new Map<string, Symbol>();
+  private readonly blocks: BasicBlock[] = [];
   private currentBlock: BasicBlock;
 
   constructor() {

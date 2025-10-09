@@ -35,7 +35,7 @@ export const DEFAULT_LAYOUT: MemoryLayout = {
 };
 
 export class MemoryMapper {
-  private layout: MemoryLayout;
+  private readonly layout: MemoryLayout;
   private variableCounter = 0;
   private tempCounter = 0;
   private flagCounter = 0;

@@ -69,11 +69,7 @@ export class WhileStatement extends Statement {
   }
 }
 
-export class HaltStatement extends Statement {
-  constructor(line: number, column: number) {
-    super(line, column);
-  }
-}
+export class HaltStatement extends Statement {}
 
 // Expressions
 export abstract class Expression extends ASTNode {}
@@ -144,7 +140,7 @@ export class ParseError extends Error {
 }
 
 export class Parser {
-  private tokens: Token[];
+  private readonly tokens: Token[];
   private current: number = 0;
 
   constructor(source: string) {
@@ -493,7 +489,7 @@ export class Parser {
     if (this.match(TokenType.NUMBER)) {
       const token = this.previous();
       return new NumberLiteral(
-        parseInt(token.value, 10),
+        Number.parseInt(token.value, 10),
         token.line,
         token.column
       );

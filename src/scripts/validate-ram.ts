@@ -127,7 +127,7 @@ class ValidatorCLI {
           console.log(`   Instruction breakdown:`);
           Object.entries(validationResult.statistics.instructionCount).forEach(
             ([opcode, count]) => {
-              const name = getInstructionName(parseInt(opcode));
+              const name = getInstructionName(Number.parseInt(opcode));
               console.log(`     ${name}: ${count}`);
             }
           );

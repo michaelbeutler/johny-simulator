@@ -60,7 +60,7 @@ export class LexerError extends Error {
 }
 
 export class Lexer {
-  private source: string;
+  private readonly source: string;
   private position: number = 0;
   private line: number = 1;
   private column: number = 1;

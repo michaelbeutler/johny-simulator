@@ -273,8 +273,8 @@ class InteractiveSimulator {
       return;
     }
 
-    const start = startStr ? parseInt(startStr) : 0;
-    const end = endStr ? parseInt(endStr) : Math.min(start + 20, 999);
+    const start = startStr ? Number.parseInt(startStr) : 0;
+    const end = endStr ? Number.parseInt(endStr) : Math.min(start + 20, 999);
 
     console.log(chalk.cyan(`📋 Memory [${start}-${end}]:`));
     console.log('Addr | Value | Instruction');
@@ -364,8 +364,8 @@ class InteractiveSimulator {
       return;
     }
 
-    const addr = parseInt(addrStr);
-    const value = parseInt(valueStr);
+    const addr = Number.parseInt(addrStr);
+    const value = Number.parseInt(valueStr);
 
     if (isNaN(addr) || addr < 0 || addr >= 1000) {
       console.log(chalk.red('Invalid address. Must be 0-999.'));

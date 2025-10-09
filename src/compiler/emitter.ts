@@ -66,9 +66,11 @@ export class Emitter {
     // Add variable memory map header if comments are enabled
     // But only if not in compatible mode (which would break Johnny simulator)
     if (includeComments && !compatibleMode) {
-      lines.push('// =================================');
-      lines.push('// VARIABLE MEMORY MAP');
-      lines.push('// =================================');
+      lines.push(
+        '// =================================',
+        '// VARIABLE MEMORY MAP',
+        '// ================================='
+      );
 
       // Add variables section
       if (memoryMap.variables.size > 0) {
@@ -120,8 +122,7 @@ export class Emitter {
         }
       }
 
-      lines.push('// =================================');
-      lines.push('');
+      lines.push('// =================================', '');
     }
 
     // Add program instructions

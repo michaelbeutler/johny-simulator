@@ -152,16 +152,18 @@ export class CodeGenerator {
     } else if (instr.value === 1) {
       // Copy CONST_1
       const const1Addr = this.memoryMapper.getAddress(memoryMap, 'CONST_1');
-      instructions.push({
-        opcode: OPCODES.TAKE, // TAKE
-        operand: const1Addr,
-        comment: `Load CONST_1`,
-      });
-      instructions.push({
-        opcode: OPCODES.SAVE, // SAVE
-        operand: destAddr,
-        comment: `${instr.dest} = 1`,
-      });
+      instructions.push(
+        {
+          opcode: OPCODES.TAKE, // TAKE
+          operand: const1Addr,
+          comment: `Load CONST_1`,
+        },
+        {
+          opcode: OPCODES.SAVE, // SAVE
+          operand: destAddr,
+          comment: `${instr.dest} = 1`,
+        }
+      );
     } else {
       // Generate value using NULL + INC loops for small positive values
       if (instr.value > 0 && instr.value <= 10) {
@@ -194,16 +196,18 @@ export class CodeGenerator {
     const destAddr = this.memoryMapper.getAddress(memoryMap, instr.dest);
 
     // MOVE src → dest: TAKE src; SAVE dest
-    instructions.push({
-      opcode: OPCODES.TAKE, // TAKE
-      operand: srcAddr,
-      comment: `Load ${instr.src}`,
-    });
-    instructions.push({
-      opcode: OPCODES.SAVE, // SAVE
-      operand: destAddr,
-      comment: `${instr.dest} = ${instr.src}`,
-    });
+    instructions.push(
+      {
+        opcode: OPCODES.TAKE, // TAKE
+        operand: srcAddr,
+        comment: `Load ${instr.src}`,
+      },
+      {
+        opcode: OPCODES.SAVE, // SAVE
+        operand: destAddr,
+        comment: `${instr.dest} = ${instr.src}`,
+      }
+    );
   }
 
   private generateBinary(
@@ -218,40 +222,44 @@ export class CodeGenerator {
     switch (instr.op) {
       case '+':
         // ADD: TAKE left; ADD right; SAVE dest
-        instructions.push({
-          opcode: OPCODES.TAKE, // TAKE
-          operand: leftAddr,
-          comment: `Load ${instr.left}`,
-        });
-        instructions.push({
-          opcode: OPCODES.ADD, // ADD
-          operand: rightAddr,
-          comment: `Add ${instr.right}`,
-        });
-        instructions.push({
-          opcode: OPCODES.SAVE, // SAVE
-          operand: destAddr,
-          comment: `${instr.dest} = ${instr.left} + ${instr.right}`,
-        });
+        instructions.push(
+          {
+            opcode: OPCODES.TAKE, // TAKE
+            operand: leftAddr,
+            comment: `Load ${instr.left}`,
+          },
+          {
+            opcode: OPCODES.ADD, // ADD
+            operand: rightAddr,
+            comment: `Add ${instr.right}`,
+          },
+          {
+            opcode: OPCODES.SAVE, // SAVE
+            operand: destAddr,
+            comment: `${instr.dest} = ${instr.left} + ${instr.right}`,
+          }
+        );
         break;
 
       case '-':
         // SUB: TAKE left; SUB right; SAVE dest
-        instructions.push({
-          opcode: OPCODES.TAKE, // TAKE
-          operand: leftAddr,
-          comment: `Load ${instr.left}`,
-        });
-        instructions.push({
-          opcode: OPCODES.SUB, // SUB
-          operand: rightAddr,
-          comment: `Subtract ${instr.right}`,
-        });
-        instructions.push({
-          opcode: OPCODES.SAVE, // SAVE
-          operand: destAddr,
-          comment: `${instr.dest} = ${instr.left} - ${instr.right}`,
-        });
+        instructions.push(
+          {
+            opcode: OPCODES.TAKE, // TAKE
+            operand: leftAddr,
+            comment: `Load ${instr.left}`,
+          },
+          {
+            opcode: OPCODES.SUB, // SUB
+            operand: rightAddr,
+            comment: `Subtract ${instr.right}`,
+          },
+          {
+            opcode: OPCODES.SAVE, // SAVE
+            operand: destAddr,
+            comment: `${instr.dest} = ${instr.left} - ${instr.right}`,
+          }
+        );
         break;
 
       case '*':
@@ -444,21 +452,23 @@ export class CodeGenerator {
     const const1Addr = this.memoryMapper.getAddress(memoryMap, 'CONST_1');
 
     // EQ(A,B): TAKE A; SUB B; SAVE T; NULL FLAG; TST T; INC FLAG; TAKE CONST_1; SUB FLAG; SAVE FLAG
-    instructions.push({
-      opcode: OPCODES.TAKE, // TAKE
-      operand: leftAddr,
-      comment: `Load ${instr.left}`,
-    });
-    instructions.push({
-      opcode: OPCODES.SUB, // SUB
-      operand: rightAddr,
-      comment: `Subtract ${instr.right}`,
-    });
-    instructions.push({
-      opcode: OPCODES.SAVE, // SAVE
-      operand: tempAddr,
-      comment: 'Save difference',
-    });
+    instructions.push(
+      {
+        opcode: OPCODES.TAKE, // TAKE
+        operand: leftAddr,
+        comment: `Load ${instr.left}`,
+      },
+      {
+        opcode: OPCODES.SUB, // SUB
+        operand: rightAddr,
+        comment: `Subtract ${instr.right}`,
+      },
+      {
+        opcode: OPCODES.SAVE, // SAVE
+        operand: tempAddr,
+        comment: 'Save difference',
+      }
+    );
     instructions.push({
       opcode: OPCODES.NULL, // NULL
       operand: destAddr,
@@ -475,21 +485,23 @@ export class CodeGenerator {
       comment: `${instr.dest} = (diff != 0)`,
     });
     // Invert the result: FLAG = 1 - FLAG
-    instructions.push({
-      opcode: OPCODES.TAKE, // TAKE
-      operand: const1Addr,
-      comment: 'Load 1',
-    });
-    instructions.push({
-      opcode: OPCODES.SUB, // SUB
-      operand: destAddr,
-      comment: 'Subtract flag',
-    });
-    instructions.push({
-      opcode: OPCODES.SAVE, // SAVE
-      operand: destAddr,
-      comment: `${instr.dest} = ${instr.left} == ${instr.right}`,
-    });
+    instructions.push(
+      {
+        opcode: OPCODES.TAKE, // TAKE
+        operand: const1Addr,
+        comment: 'Load 1',
+      },
+      {
+        opcode: OPCODES.SUB, // SUB
+        operand: destAddr,
+        comment: 'Subtract flag',
+      },
+      {
+        opcode: OPCODES.SAVE, // SAVE
+        operand: destAddr,
+        comment: `${instr.dest} = ${instr.left} == ${instr.right}`,
+      }
+    );
   }
 
   private generateNotEquals(

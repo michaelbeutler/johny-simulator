@@ -53,9 +53,9 @@ export class ControlFlowAnalyzer {
 
       // Handle JOHNNY's compressed opcode format (01xxx -> 10, 02xxx -> 20, etc.)
       const valueStr = instruction.toString().padStart(5, '0');
-      const opcodeDigits = parseInt(valueStr.slice(0, 2), 10);
+      const opcodeDigits = Number.parseInt(valueStr.slice(0, 2), 10);
       const opcode = opcodeDigits * 10; // Convert to actual opcode (01 -> 10, 02 -> 20, etc.)
-      const operand = parseInt(valueStr.slice(2), 10);
+      const operand = Number.parseInt(valueStr.slice(2), 10);
       const instructionName = getInstructionName(opcode);
 
       let nodeType: FlowNode['type'] = 'sequential';

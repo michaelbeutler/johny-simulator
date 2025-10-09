@@ -22,7 +22,7 @@ class JohnnyTestRunner {
       }
 
       lines.forEach((line, index) => {
-        const value = parseInt(line.trim());
+        const value = Number.parseInt(line.trim());
         if (!isNaN(value)) {
           ram[index] = value;
         }
@@ -254,7 +254,7 @@ class JohnnyTestRunner {
           for (const [addr, expectedValue] of Object.entries(
             checks.memoryChanges
           )) {
-            const actualValue = executionState.ram[parseInt(addr)];
+            const actualValue = executionState.ram[Number.parseInt(addr)];
             if (actualValue !== expectedValue) {
               result.errors.push(
                 `Expected memory[${addr}] = ${expectedValue}, got ${actualValue}`

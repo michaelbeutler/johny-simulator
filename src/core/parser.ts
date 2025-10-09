@@ -61,8 +61,8 @@ export class RamParser {
     // Check for explicit address syntax: @address:value
     const addressMatch = commentStripped.match(/^\s*@(\d+):(\d+)/);
     if (addressMatch) {
-      const address = parseInt(addressMatch[1], 10);
-      const value = parseInt(addressMatch[2], 10);
+      const address = Number.parseInt(addressMatch[1], 10);
+      const value = Number.parseInt(addressMatch[2], 10);
       return { value, address };
     }
 
@@ -72,7 +72,7 @@ export class RamParser {
       return { value: null, address: -1 };
     }
 
-    const value = parseInt(match[1], 10);
+    const value = Number.parseInt(match[1], 10);
 
     // Use sequential addressing (line number = address)
     return { value, address: -1 }; // -1 means use line index
