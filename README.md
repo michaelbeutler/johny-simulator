@@ -1,6 +1,6 @@
 # JOHNNY RAM Validator & Simulator
 
-A comprehensive TypeScript + Bun implementation of the JOHNNY computer simulator with automated testing, validation, documentation generation, and a complete Johnny C compiler.
+A comprehensive TypeScript + Bun implementation of the JOHNNY computer simulator with automated testing, validation, documentation generation, and a complete **Johnny C** compiler.
 
 ## 🚀 Quick Start
 
@@ -14,6 +14,9 @@ bun test
 # Compile Johnny C to JOHNNY RAM
 bun run compile jcc/simple_add.jcc
 
+# Compile with comments and variable map
+bun run compile jcc/showcase.jcc --comments --print-vars
+
 # Validate a specific program
 bun run validate scripts/multiply.ram
 
@@ -24,38 +27,151 @@ bun run simulate scripts/addition.ram
 bun run docs
 ```
 
-## 🔧 Johnny C Compiler
+## 🔧 Johnny C Compiler (.jcc files)
 
-Johnny C is a C-like language that compiles to JOHNNY RAM assembly. It supports variables, arithmetic, conditionals, loops, and basic expressions.
+**Johnny C** is a C-like programming language that compiles directly to JOHNNY RAM assembly language. It provides a high-level, readable syntax while maintaining full compatibility with the JOHNNY computer architecture.
 
-### Syntax Guide
+### Why Johnny C?
 
-#### Variable Declarations
+- **Educational**: Learn programming concepts with immediate hardware visualization
+- **Minimal**: Simple syntax focused on core programming constructs
+- **Compatible**: Compiles to standard JOHNNY RAM format
+- **Debuggable**: Rich debugging features with variable memory mapping
+- **Interactive**: Works seamlessly with the JOHNNY simulator
+
+## 📖 Johnny C Language Reference
+
+### File Extension
+
+Johnny C programs use the `.jcc` file extension (Johnny C Compiler).
+
+### Basic Program Structure
 
 ```c
-int x;          // Declare integer variable
-bool flag;      // Declare boolean variable
+// Variable declarations (must come first)
+int x;
+int y;
+bool flag;
+
+// Program logic
+x = 5;
+y = 10;
+flag = x < y;
+
+if (flag) {
+    x = x + y;
+}
+
+halt;  // Program termination
 ```
 
-#### Assignments
+### Data Types
+
+Johnny C supports two primitive data types:
 
 ```c
-x = 5;          // Assign constant
-y = x + 2;      // Assign expression result
-flag = true;    // Boolean assignment
+int number;     // Integer values (signed, range depends on JOHNNY architecture)
+bool flag;      // Boolean values (true/false)
 ```
 
-#### Arithmetic Operations
+### Variable Declarations
+
+All variables must be declared before use:
+
+```c
+int x;          // Declare integer variable x
+int result;     // Declare integer variable result
+bool condition; // Declare boolean variable condition
+```
+
+### Memory Layout
+
+Variables are automatically allocated in memory:
+
+- **Variables**: RAM[900-949] (user variables, allocated alphabetically)
+- **Constants**: RAM[150-151] (CONST_0=0, CONST_1=1)
+- **Temporaries**: RAM[960-989] (compiler-generated temporary values)
+- **Flags**: RAM[990-995] (boolean variables and conditions)
+
+### Assignments and Expressions
+
+```c
+// Simple assignment
+x = 5;
+y = 10;
+
+// Expression assignment
+sum = x + y;
+difference = x - y;
+product = x * y;
+
+// Boolean assignment
+flag = true;
+condition = false;
+result = x > y;
+```
+
+### Arithmetic Operations
+
+Johnny C supports basic arithmetic with automatic optimization:
 
 ```c
 result = a + b;  // Addition
 result = a - b;  // Subtraction
-result = a * b;  // Multiplication (limited to small numbers)
+result = a * b;  // Multiplication (uses repeated addition for efficiency)
+
+// Complex expressions
+total = (a + b) * c;
+average = sum / count;  // Note: Division not yet implemented
 ```
 
-#### Conditional Statements
+**Performance Note**: For best performance, use small constants (≤10) as the multiplication algorithm uses repeated addition.
+
+### Comparison Operations
+
+All standard comparison operators are supported:
 
 ```c
+// Equality
+if (x == y) { /* equal */ }
+if (x != y) { /* not equal */ }
+
+// Relational
+if (x < y)  { /* less than */ }
+if (x > y)  { /* greater than */ }
+if (x <= y) { /* less than or equal */ }
+if (x >= y) { /* greater than or equal */ }
+```
+
+### Boolean Operations
+
+```c
+// Boolean literals
+flag1 = true;
+flag2 = false;
+
+// Logical operators
+result = flag1 && flag2;  // AND
+result = flag1 || flag2;  // OR
+result = !flag1;          // NOT
+
+// Complex conditions
+if (x > 0 && y < 10) {
+    // Both conditions true
+}
+```
+
+### Control Flow
+
+#### If Statements
+
+```c
+// Simple if
+if (x > 0) {
+    y = 1;
+}
+
+// If-else
 if (x > 0) {
     y = 1;
 } else {
@@ -66,83 +182,305 @@ if (x > 0) {
 if (a > b) {
     if (c > 0) {
         result = a + c;
+    } else {
+        result = a - c;
     }
+} else {
+    result = b;
 }
 ```
 
 #### While Loops
 
 ```c
-while (i < 10) {
+// Countdown loop
+i = 10;
+while (i > 0) {
     sum = sum + i;
-    i = i + 1;
+    i = i - 1;
+}
+
+// Accumulation loop
+count = 0;
+total = 0;
+while (count < 10) {
+    total = total + count;
+    count = count + 1;
 }
 ```
 
-#### Comparison Operators
+### Comments
 
-- `==` (equals)
-- `!=` (not equals)
-- `<` (less than)
-- `>` (greater than)
-- `<=` (less than or equal)
-- `>=` (greater than or equal)
-
-#### Boolean Operators
-
-- `&&` (and)
-- `||` (or)
-- `!` (not)
-
-#### Program Termination
+Johnny C supports C-style single-line comments:
 
 ```c
-halt;  // End program execution
+// This is a comment
+int x;  // Inline comment
+// TODO: Add more features
 ```
 
-### Compiler Usage
+### Program Termination
+
+Every Johnny C program should end with a halt statement:
+
+```c
+halt;  // Terminates program execution
+```
+
+### Language Limitations
+
+Current limitations of Johnny C:
+
+- **No Functions**: No user-defined functions or procedures yet
+- **No Arrays**: Single variables only
+- **Limited Types**: Only `int` and `bool` types
+- **No Division**: Division operator not implemented
+- **Small Constants**: Best performance with constants ≤10
+- **No Strings**: No string data type or operations
+
+## 🛠️ Johnny C Compiler Usage
+
+### Basic Compilation
 
 ```bash
-# Compile a Johnny C program
-bun run compile <filename.jcc>
+# Compile a Johnny C program (generates .ram file)
+bun run compile program.jcc
 
-# This generates a .ram file that can be simulated
-bun run simulate <filename.ram>
+# Specify output file
+bun run compile program.jcc -o custom_name.ram
 ```
 
-### Example Programs
+### Advanced Compilation Options
 
-See the `jcc/` directory for example programs:
+```bash
+# Include inline comments in output
+bun run compile program.jcc --comments
 
-- `simple_add.jcc` - Basic arithmetic
-- `variables.jcc` - Variable declarations and assignments
-- `if_else.jcc` - Conditional statements
-- `countdown.jcc` - While loop with countdown
-- `comparisons.jcc` - All comparison operators (==, !=, <, >, <=, >=)
-- `expressions.jcc` - Complex expressions
-- `nested_if.jcc` - Nested conditional statements
-- `factorial.jcc` - Iterative accumulation
-- `demo.jcc` - Mixed arithmetic and boolean operations
-- `showcase.jcc` - Comprehensive language feature demonstration
+# Print variable memory mapping to console
+bun run compile program.jcc --print-vars
 
-### Recent Improvements
+# Generate memory map files (.json and .md)
+bun run compile program.jcc --memmap memory_map.json
 
-✅ **Full Comparison Support**: All comparison operators now implemented
-✅ **Boolean Literals**: `true` and `false` keywords supported
-✅ **Enhanced Examples**: 10+ example programs covering all language features
-✅ **Comprehensive Testing**: Automated test script for all examples
+# Combined options for debugging
+bun run compile program.jcc --comments --print-vars --memmap debug.json
+```
 
-### Limitations
+### Johnny Simulator Compatibility
 
-- Constants must be small integers (≤10) for optimal performance
-- Multiplication uses repeated addition algorithm
-- No functions or procedures yet
-- Limited to integer and boolean types
+By default, the compiler generates files compatible with the original Johnny simulator:
 
-## 📊 Program Summary
+```bash
+# Default mode - Johnny simulator compatible
+bun run compile program.jcc
 
-- **Total Programs:** 3
-- **Valid Programs:** 3/3
+# Non-compatible mode with comment headers (for debugging)
+bun run compile program.jcc --comments --no-compatible
+```
+
+### Variable Memory Map Output
+
+When using `--print-vars`, the compiler shows exactly where your variables are stored:
+
+```
+=================================
+VARIABLE MEMORY MAP
+=================================
+Variables:
+  result (int) -> RAM[900]
+  x (int) -> RAM[901]
+  y (int) -> RAM[902]
+Constants:
+  CONST_0 -> RAM[150] = 0
+  CONST_1 -> RAM[151] = 1
+Temporary Variables:
+  _t0 -> RAM[960]
+  _t1 -> RAM[961]
+=================================
+```
+
+### Workflow: Compile and Simulate
+
+After compilation, you can immediately simulate your program:
+
+```bash
+# 1. Compile Johnny C to JOHNNY RAM
+bun run compile countdown.jcc --comments
+
+# 2. Simulate the generated program
+bun run simulate countdown.ram
+
+# 3. Or validate the program first
+bun run validate countdown.ram
+```
+
+## 📚 Example Programs
+
+The `jcc/` directory contains comprehensive examples demonstrating all Johnny C features:
+
+### Basic Examples
+
+- **`simple_add.jcc`** - Basic arithmetic operations
+- **`variables.jcc`** - Variable declarations and assignments
+- **`expressions.jcc`** - Complex arithmetic expressions
+
+### Control Flow Examples
+
+- **`if_else.jcc`** - Conditional statements (if/else)
+- **`nested_if.jcc`** - Nested conditional logic
+- **`countdown.jcc`** - While loop with countdown
+
+### Comparison Examples
+
+- **`comparisons.jcc`** - All comparison operators (==, !=, <, >, <=, >=)
+
+### Advanced Examples
+
+- **`factorial.jcc`** - Iterative factorial calculation
+- **`multiply.jcc`** - Multiplication using repeated addition
+- **`demo.jcc`** - Mixed arithmetic and boolean operations
+- **`showcase.jcc`** - Comprehensive language feature demonstration
+
+### Running Examples
+
+```bash
+# Try the basic addition example
+bun run compile jcc/simple_add.jcc --print-vars
+bun run simulate simple_add.ram
+
+# Explore the comprehensive showcase
+bun run compile jcc/showcase.jcc --comments --print-vars
+
+# Test control flow with countdown
+bun run compile jcc/countdown.jcc --comments
+bun run simulate countdown.ram
+```
+
+## 🎯 Getting Started with Johnny C
+
+### 1. Your First Program
+
+Create a file called `hello.jcc`:
+
+```c
+// My first Johnny C program
+int result;
+
+result = 42;
+halt;
+```
+
+### 2. Compile and Run
+
+```bash
+# Compile your program
+bun run compile hello.jcc --print-vars
+
+# This shows where your variables are stored:
+# Variables:
+#   result (int) -> RAM[900]
+
+# Simulate the program
+bun run simulate hello.ram
+```
+
+### 3. Add Some Logic
+
+Update `hello.jcc` with conditionals:
+
+```c
+int x;
+int y;
+int max;
+
+x = 15;
+y = 23;
+
+if (x > y) {
+    max = x;
+} else {
+    max = y;
+}
+
+halt;
+```
+
+### 4. Explore Advanced Features
+
+Try loops and complex expressions:
+
+```c
+int counter;
+int total;
+bool continue_loop;
+
+counter = 1;
+total = 0;
+continue_loop = true;
+
+while (continue_loop) {
+    total = total + counter;
+    counter = counter + 1;
+
+    if (counter > 5) {
+        continue_loop = false;
+    }
+}
+
+halt;
+```
+
+### 5. Debug with Memory Maps
+
+Use the debugging features to understand what's happening:
+
+```bash
+# Compile with full debugging info
+bun run compile my_program.jcc --comments --print-vars --memmap debug.json
+
+# This generates:
+# - my_program.ram (the compiled program)
+# - debug.json (detailed memory map)
+# - debug.md (human-readable memory documentation)
+```
+
+## ✨ Language Features
+
+### ✅ Currently Supported
+
+- ✅ **Variable Declarations**: `int`, `bool` types
+- ✅ **Arithmetic**: `+`, `-`, `*` operations
+- ✅ **Comparisons**: `==`, `!=`, `<`, `>`, `<=`, `>=`
+- ✅ **Boolean Logic**: `&&`, `||`, `!` operators
+- ✅ **Control Flow**: `if`/`else`, `while` loops
+- ✅ **Constants**: `true`, `false`, integer literals
+- ✅ **Comments**: C-style `//` comments
+- ✅ **Program Control**: `halt` statement
+
+### 🚧 Planned Features
+
+- 🚧 **Functions**: User-defined functions and procedures
+- 🚧 **Arrays**: Array declarations and indexing
+- 🚧 **Division**: Integer division operator `/`
+- 🚧 **Modulo**: Remainder operator `%`
+- 🚧 **For Loops**: `for` loop syntax
+- 🚧 **String Type**: Basic string operations
+- 🚧 **Input/Output**: Read/write operations
+
+## 📊 Project Summary
+
+### Johnny C Compiler (.jcc)
+
+- **Johnny C Programs:** 11 example programs
+- **Language Features:** Variables, arithmetic, conditionals, loops, booleans
+- **Compilation Targets:** JOHNNY RAM assembly language
+- **Memory Management:** Automatic variable allocation and optimization
+- **Debugging Support:** Variable memory maps, inline comments, JSON/Markdown output
+
+### JOHNNY RAM Programs (.ram)
+
+- **Hand-written Programs:** 3 legacy assembly programs
+- **Valid Programs:** 3/3 ✅
 - **Total Instructions:** 18
 - **All Tests:** ✅ 13/13 passing
 
@@ -160,6 +498,7 @@ _See [PROGRAMS.md](PROGRAMS.md) for auto-generated program analysis._
 
 | Script         | Command                   | Description                             |
 | -------------- | ------------------------- | --------------------------------------- |
+| **compile**    | `bun run compile <file>`  | Compile Johnny C (.jcc) to JOHNNY RAM   |
 | **test**       | `bun test`                | Run all test suites with coverage       |
 | **test:watch** | `bun test --watch`        | Run tests in watch mode                 |
 | **docs**       | `bun run docs`            | Generate documentation for all programs |
@@ -167,6 +506,17 @@ _See [PROGRAMS.md](PROGRAMS.md) for auto-generated program analysis._
 | **simulate**   | `bun run simulate <file>` | Run interactive simulation              |
 | **clean**      | `bun run clean`           | Clean generated files                   |
 | **dev**        | `bun run dev`             | Development mode (test watch)           |
+
+### Johnny C Compiler Options
+
+| Option            | Description                               | Example                                                  |
+| ----------------- | ----------------------------------------- | -------------------------------------------------------- |
+| `-o <file>`       | Specify output file                       | `bun run compile program.jcc -o output.ram`              |
+| `--comments`      | Include inline comments in output         | `bun run compile program.jcc --comments`                 |
+| `--print-vars`    | Print variable memory map to console      | `bun run compile program.jcc --print-vars`               |
+| `--memmap <file>` | Generate memory map files (.json and .md) | `bun run compile program.jcc --memmap map.json`          |
+| `--no-compatible` | Disable Johnny simulator compatibility    | `bun run compile program.jcc --comments --no-compatible` |
+| `--help`          | Show compiler help                        | `bun run compile --help`                                 |
 
 ## 📖 Documentation System
 
@@ -368,13 +718,27 @@ expect(result.warnings).toBeDefined(); // Warnings array exists
 ## 📁 Project Structure
 
 ```
-├── scripts/                    # RAM programs and tests
-│   ├── *.ram                  # JOHNNY assembly programs
+├── jcc/                        # Johnny C source programs (.jcc files)
+│   ├── simple_add.jcc         # Basic arithmetic examples
+│   ├── showcase.jcc           # Comprehensive feature demo
+│   ├── countdown.jcc          # While loop examples
+│   ├── factorial.jcc          # Advanced algorithms
+│   └── *.ram                  # Compiled JOHNNY RAM files
+├── scripts/                    # Legacy RAM programs and tests
+│   ├── *.ram                  # Hand-written JOHNNY assembly
 │   ├── *.test.ts              # Jest/Bun test files
 │   └── *.md                   # Auto-generated docs
 ├── src/
+│   ├── compiler/              # Johnny C compiler
+│   │   ├── cli.ts             # Compiler command-line interface
+│   │   ├── lexer.ts           # Lexical analysis (tokenization)
+│   │   ├── parser.ts          # Syntax analysis (AST generation)
+│   │   ├── ir.ts              # Intermediate representation
+│   │   ├── codegen.ts         # Code generation (IR to JOHNNY)
+│   │   ├── emitter.ts         # Final output formatting
+│   │   └── memmap.ts          # Memory mapping and layout
 │   ├── core/                  # Core simulator components
-│   │   ├── opcodes.ts         # Instruction definitions
+│   │   ├── opcodes.ts         # JOHNNY instruction definitions
 │   │   ├── parser.ts          # RAM file parser
 │   │   └── simulator.ts       # JOHNNY simulator engine
 │   ├── scripts/               # Utility scripts
@@ -385,7 +749,7 @@ expect(result.warnings).toBeDefined(); // Warnings array exists
 │   ├── testing/               # Test utilities and helpers
 │   ├── types/                 # TypeScript type definitions
 │   └── validation/            # Validation logic
-└── examples/                  # Example programs and tutorials
+└── tests/                     # Compiler and integration tests
 ```
 
 ## 🛠️ JOHNNY Instruction Set
@@ -459,20 +823,222 @@ console.log('Final state:', result);
 console.log('Execution trace:', result.trace);
 ```
 
+## 🔧 How Johnny C Works
+
+### Compilation Pipeline
+
+Johnny C uses a multi-stage compilation process:
+
+```
+Johnny C (.jcc) → Lexer → Parser → IR Generator → Code Generator → Emitter → JOHNNY RAM (.ram)
+```
+
+1. **Lexical Analysis**: Converts source code into tokens
+2. **Syntax Analysis**: Builds Abstract Syntax Tree (AST) from tokens
+3. **IR Generation**: Creates Intermediate Representation with symbol table
+4. **Memory Mapping**: Assigns memory addresses to variables
+5. **Code Generation**: Converts IR to JOHNNY assembly instructions
+6. **Emission**: Formats final output with optional comments
+
+### Example Compilation
+
+**Input (`example.jcc`):**
+
+```c
+int x;
+int result;
+
+x = 5;
+result = x * 3;
+halt;
+```
+
+**Output (`example.ram`):**
+
+```
+09150  // Initialize CONST_0 = 0
+09151  // Initialize CONST_1 = 0
+07151  // CONST_1 = 1
+09901  // entry: x = 0
+09900  // result = 0
+09960  // _t0 = 0
+07960  // _t0++
+07960  // _t0++
+07960  // _t0++
+07960  // _t0++
+07960  // _t0++
+01960  // Load _t0
+04901  // x = _t0
+01901  // Load x
+04961  // _t1 = x
+09962  // _t2 = 0
+01961  // Load _t1
+04963  // _t3 = _t1
+01962  // Load _t2
+02963  // Add _t3
+04962  // _t2 = _t2 + _t3
+01961  // Load _t1
+08961  // _t1--
+06961  // Skip next if _t1 = 0
+05016  // Jump to 016
+01962  // Load _t2
+04900  // result = _t2
+10000  // Program end
+```
+
+**Memory Map:**
+
+```
+Variables:
+  result (int) -> RAM[900]
+  x (int) -> RAM[901]
+Constants:
+  CONST_0 -> RAM[150] = 0
+  CONST_1 -> RAM[151] = 1
+Temporary Variables:
+  _t0 -> RAM[960]
+  _t1 -> RAM[961]
+  _t2 -> RAM[962]
+  _t3 -> RAM[963]
+```
+
+### Optimization Features
+
+- **Constant Propagation**: Small constants (≤10) compiled to efficient increment sequences
+- **Dead Code Elimination**: Unused variables and expressions are optimized away
+- **Register Allocation**: Efficient use of temporary memory locations
+- **Loop Optimization**: While loops compiled to efficient jump patterns
+
 ## 🤝 Contributing
+
+### For Johnny C Development
+
+1. **Add Language Features:** Extend lexer, parser, and code generator
+2. **Create Examples:** Add new `.jcc` programs demonstrating features
+3. **Write Tests:** Test both compilation and execution
+4. **Update Documentation:** Keep README and examples current
+
+### For JOHNNY RAM Programs
 
 1. **Add Programs:** Follow the 3-file pattern (.ram, .test.ts, auto-generated .md)
 2. **Write Tests:** Use descriptive "should..." test names
 3. **Generate Docs:** Run `bun run docs` after changes
 4. **Test Everything:** Ensure `bun test` passes
 
-## 📚 Resources
+## � Troubleshooting
+
+### Common Johnny C Compilation Issues
+
+**Error: "Parse error at line X, column Y: Expected ';' after variable declaration"**
+
+```c
+// ❌ Wrong
+int x
+
+// ✅ Correct
+int x;
+```
+
+**Error: "Symbol 'variable' not found in memory map"**
+
+```c
+// ❌ Wrong - using undeclared variable
+result = x + y;
+
+// ✅ Correct - declare first
+int x;
+int y;
+int result;
+result = x + y;
+```
+
+**Error: "Compilation failed: Variable 'x' declared but never used"**
+
+```c
+// ❌ Wrong - unused variable
+int x;
+int y;
+y = 5;
+
+// ✅ Correct - use all declared variables or remove unused ones
+int y;
+y = 5;
+```
+
+### Johnny Simulator Compatibility Issues
+
+**Problem: "Johnny simulator can't load the .ram file"**
+
+Solution: Ensure you're using compatible mode (default):
+
+```bash
+# ✅ Compatible with Johnny simulator
+bun run compile program.jcc
+
+# ❌ Not compatible (has comment headers)
+bun run compile program.jcc --comments --no-compatible
+```
+
+**Problem: "Variables aren't where I expect them in memory"**
+
+Solution: Use `--print-vars` to see exact memory layout:
+
+```bash
+bun run compile program.jcc --print-vars
+```
+
+### Performance Issues
+
+**Problem: "Multiplication is very slow"**
+
+Johnny C uses repeated addition for multiplication. For best performance:
+
+```c
+// ✅ Fast - small constants
+result = x * 3;
+
+// ⚠️ Slower - large constants
+result = x * 100;
+```
+
+**Problem: "Program takes too long to compile"**
+
+For complex programs, the compiler generates many temporary variables. This is normal for:
+
+- Complex expressions: `result = (a + b) * (c - d);`
+- Nested conditions: Multiple levels of if/else
+- Long loops: While loops with complex conditions
+
+## �📚 Resources
+
+### Johnny C Language
+
+- **Language Guide:** This README contains the complete Johnny C reference
+- **Example Programs:** See `jcc/` directory for comprehensive examples
+- **Compiler Source:** Full source code in `src/compiler/`
+- **Memory Layout:** Automatic variable allocation with debugging support
+
+### JOHNNY Computer Architecture
 
 - **JOHNNY Specification:** Classic educational computer architecture
+- **Instruction Set:** 11 core instructions for educational computing
+- **Memory Model:** 1000-word memory with accumulator-based operations
+- **Simulation:** Full interactive simulation with step-by-step debugging
+
+### Development Tools
+
 - **Bun Runtime:** Fast TypeScript execution and testing
-- **Jest Testing:** Comprehensive test framework integration
+- **TypeScript:** Type-safe development with comprehensive tooling
+- **Jest/Bun Testing:** Comprehensive test framework integration
 - **Auto-Documentation:** Generates docs from tests and code analysis
+
+### Learning Resources
+
+- **Getting Started:** Follow the step-by-step guide above
+- **Examples:** Start with `simple_add.jcc`, progress to `showcase.jcc`
+- **Debugging:** Use `--print-vars` and `--comments` for learning
+- **Simulation:** Run compiled programs in the interactive simulator
 
 ---
 
-_Documentation maintained manually. Program analysis auto-generated with `bun run docs`._
+_Johnny C documentation maintained manually. JOHNNY RAM program analysis auto-generated with `bun run docs`._
