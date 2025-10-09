@@ -52,14 +52,79 @@ export class Emitter {
   }
 
   /**
-   * Format program as string array for .ram file
+   * Format as RAM file lines
    */
   formatAsRamFile(
     emitted: EmittedProgram,
-    includeComments: boolean = false
+    memoryMap: MemoryMap,
+    symbols: Map<string, { type: string }>,
+    includeComments: boolean = false,
+    compatibleMode: boolean = true
   ): string[] {
     const lines: string[] = [];
 
+    // Add variable memory map header if comments are enabled
+    // But only if not in compatible mode (which would break Johnny simulator)
+    if (includeComments && !compatibleMode) {
+      lines.push('// =================================');
+      lines.push('// VARIABLE MEMORY MAP');
+      lines.push('// =================================');
+
+      // Add variables section
+      if (memoryMap.variables.size > 0) {
+        lines.push('// Variables:');
+        const sortedVars = Array.from(memoryMap.variables.entries()).sort(
+          ([, a], [, b]) => a - b
+        );
+        for (const [name, address] of sortedVars) {
+          const symbol = symbols.get(name);
+          lines.push(
+            `//   ${name} (${symbol?.type || 'unknown'}) -> RAM[${address}]`
+          );
+        }
+      }
+
+      // Add constants section
+      lines.push('// Constants:');
+      const const0Addr = memoryMap.constants.get(0);
+      const const1Addr = memoryMap.constants.get(1);
+      if (const0Addr !== undefined) {
+        lines.push(`//   CONST_0 -> RAM[${const0Addr}] = 0`);
+      }
+      if (const1Addr !== undefined) {
+        lines.push(`//   CONST_1 -> RAM[${const1Addr}] = 1`);
+      }
+
+      // Add temporaries section if any exist
+      if (memoryMap.temps.size > 0) {
+        lines.push('// Temporary Variables:');
+        const sortedTemps = Array.from(memoryMap.temps.entries()).sort(
+          ([, a], [, b]) => a - b
+        );
+        for (const [name, address] of sortedTemps) {
+          lines.push(`//   ${name} -> RAM[${address}]`);
+        }
+      }
+
+      // Add flags section if any exist
+      if (memoryMap.flags.size > 0) {
+        lines.push('// Boolean Flags:');
+        const sortedFlags = Array.from(memoryMap.flags.entries()).sort(
+          ([, a], [, b]) => a - b
+        );
+        for (const [name, address] of sortedFlags) {
+          const symbol = symbols.get(name);
+          lines.push(
+            `//   ${name} (${symbol?.type || 'bool'}) -> RAM[${address}]`
+          );
+        }
+      }
+
+      lines.push('// =================================');
+      lines.push('');
+    }
+
+    // Add program instructions
     for (let i = 0; i < emitted.instructions.length; i++) {
       const instruction = emitted.instructions[i];
       let line = instruction.toString().padStart(5, '0');
@@ -102,7 +167,7 @@ export class Emitter {
 
     // Special handling for specific instruction types
     switch (instr.opcode) {
-      case 50: // JMP
+      case 5: // JMP
         if (instr.label) {
           const labelAddr = labelMap.get(instr.label);
           if (labelAddr === undefined) {
@@ -112,7 +177,7 @@ export class Emitter {
         }
         break;
 
-      case 60: // TST
+      case 6: // TST
         // For conditional jumps, we need to resolve the condition variable
         if (instr.comment && instr.comment.includes('Test ')) {
           const match = instr.comment.match(/Test (\w+)/);

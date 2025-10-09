@@ -12,7 +12,7 @@ for jcc_file in $examples_dir/*.jcc
     set ram_file $examples_dir/$basename.ram
     
     echo "📝 Compiling $jcc_file..."
-    if bun run compile $jcc_file
+    if bun run compile $jcc_file --print-vars
         echo "✅ $basename.jcc compiled successfully"
         
         # Check if .ram file was generated

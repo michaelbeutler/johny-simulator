@@ -3,8 +3,8 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname, basename, extname } from 'path';
 import { Parser, ParseError } from './parser';
-import { IRGenerator } from './ir';
-import { MemoryMapper, DEFAULT_LAYOUT } from './memmap';
+import { IRGenerator, Symbol } from './ir';
+import { MemoryMapper, DEFAULT_LAYOUT, MemoryMap } from './memmap';
 import { CodeGenerator } from './codegen';
 import { Emitter } from './emitter';
 import { LexerError } from './lexer';
@@ -15,6 +15,8 @@ export interface CompilerOptions {
   includeComments: boolean;
   memoryMapJson?: string;
   memoryMapMarkdown?: string;
+  printVarMap?: boolean;
+  compatibleMode?: boolean;
 }
 
 export class JohnnyCompiler {
@@ -78,7 +80,10 @@ export class JohnnyCompiler {
         options.outputFile || this.getDefaultOutputFile(sourceFile);
       const ramLines = emitter.formatAsRamFile(
         emitted,
-        options.includeComments
+        memoryMap,
+        symbols,
+        options.includeComments,
+        options.compatibleMode ?? true
       );
       writeFileSync(outputFile, ramLines.join('\n') + '\n');
       console.log(`Generated ${outputFile}`);
@@ -102,6 +107,11 @@ export class JohnnyCompiler {
         console.log(`Generated memory map: ${options.memoryMapMarkdown}`);
       }
 
+      // Print variable map to console if requested
+      if (options.printVarMap) {
+        this.printVariableMap(memoryMap, symbols);
+      }
+
       console.log('Compilation successful!');
     } catch (error) {
       if (error instanceof LexerError || error instanceof ParseError) {
@@ -121,6 +131,65 @@ export class JohnnyCompiler {
     const dir = dirname(sourceFile);
     const name = basename(sourceFile, extname(sourceFile));
     return resolve(dir, `${name}.ram`);
+  }
+
+  private printVariableMap(
+    memoryMap: MemoryMap,
+    symbols: Map<string, Symbol>
+  ): void {
+    console.log('\n=================================');
+    console.log('VARIABLE MEMORY MAP');
+    console.log('=================================');
+
+    // Print variables
+    if (memoryMap.variables.size > 0) {
+      console.log('Variables:');
+      const sortedVars = Array.from(memoryMap.variables.entries()).sort(
+        ([, a], [, b]) => a - b
+      );
+      for (const [name, address] of sortedVars) {
+        const symbol = symbols.get(name);
+        console.log(
+          `  ${name} (${symbol?.type || 'unknown'}) -> RAM[${address}]`
+        );
+      }
+    }
+
+    // Print constants
+    console.log('Constants:');
+    const const0Addr = memoryMap.constants.get(0);
+    const const1Addr = memoryMap.constants.get(1);
+    if (const0Addr !== undefined) {
+      console.log(`  CONST_0 -> RAM[${const0Addr}] = 0`);
+    }
+    if (const1Addr !== undefined) {
+      console.log(`  CONST_1 -> RAM[${const1Addr}] = 1`);
+    }
+
+    // Print temporaries if any
+    if (memoryMap.temps.size > 0) {
+      console.log('Temporary Variables:');
+      const sortedTemps = Array.from(memoryMap.temps.entries()).sort(
+        ([, a], [, b]) => a - b
+      );
+      for (const [name, address] of sortedTemps) {
+        console.log(`  ${name} -> RAM[${address}]`);
+      }
+    }
+
+    // Print flags if any
+    if (memoryMap.flags.size > 0) {
+      console.log('Boolean Flags:');
+      const sortedFlags = Array.from(memoryMap.flags.entries()).sort(
+        ([, a], [, b]) => a - b
+      );
+      for (const [name, address] of sortedFlags) {
+        const symbol = symbols.get(name);
+        console.log(`  ${name} (${symbol?.type || 'bool'}) -> RAM[${address}]`);
+      }
+    }
+
+    console.log('=================================\n');
   }
 }
 
@@ -153,6 +222,14 @@ export function main(): void {
 
       case '--comments':
         options.includeComments = true;
+        break;
+
+      case '--print-vars':
+        options.printVarMap = true;
+        break;
+
+      case '--no-compatible':
+        options.compatibleMode = false;
         break;
 
       case '--memmap': {
@@ -194,6 +271,10 @@ function printUsage(): void {
     '  -o <file>       Output file (default: input name with .ram extension)'
   );
   console.log('  --comments      Include comments in output');
+  console.log('  --print-vars    Print variable memory map to console');
+  console.log(
+    '  --no-compatible Disable Johnny simulator compatible mode (allows comment headers)'
+  );
   console.log('  --memmap <file> Generate memory map files (.json and .md)');
   console.log('  -h, --help      Show this help message');
   console.log('');
