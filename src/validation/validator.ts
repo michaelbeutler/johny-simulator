@@ -65,8 +65,8 @@ export class RamValidator {
       const value = ram[addr];
       if (value === 0) continue; // Skip empty memory
 
-      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
-      const opcode = Math.floor(value / 1000) * 10;
+      // Extract opcode from instruction format (OOXXX)
+      const opcode = Math.floor(value / 1000);
       const operand = value % 1000;
 
       // Validate value range
@@ -85,6 +85,13 @@ export class RamValidator {
 
       // Validate opcode
       if (!isValidOpcode(opcode, this.opcodeMapping)) {
+        console.log(
+          `DEBUG: Invalid opcode ${opcode} from instruction ${value} at address ${addr}`
+        );
+        console.log(
+          `DEBUG: Available opcodes:`,
+          Object.keys(this.opcodeMapping)
+        );
         errors.push({
           type: 'SYNTAX',
           address: addr,
@@ -167,8 +174,8 @@ export class RamValidator {
       const value = ram[addr];
       if (value === 0) continue;
 
-      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
-      const opcode = Math.floor(value / 1000) * 10;
+      // Extract opcode from instruction format (OOXXX)
+      const opcode = Math.floor(value / 1000);
       const operand = value % 1000;
 
       if (opcode === OPCODES.DATA) {
@@ -258,8 +265,8 @@ export class RamValidator {
    */
   private programHasHalt(ram: number[]): boolean {
     return ram.some(value => {
-      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
-      const opcode = Math.floor(value / 1000) * 10;
+      // Extract opcode from instruction format (OOXXX)
+      const opcode = Math.floor(value / 1000);
       return opcode === OPCODES.HLT;
     });
   }

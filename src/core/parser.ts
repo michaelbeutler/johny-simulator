@@ -122,12 +122,12 @@ export class RamParser {
     address: number,
     lineNumber: number
   ): void {
-    // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
-    const opcode = Math.floor(value / 1000) * 10;
+    // Extract opcode: Math.floor(instruction / 1000)
+    const opcode = Math.floor(value / 1000);
     const operand = value % 1000; // Last 3 digits
 
-    // Validate opcode range (0, 10, 20, ..., 100)
-    if (opcode < 0 || opcode > OPCODES.HLT || opcode % 10 !== 0) {
+    // Validate opcode range (0, 1, 2, ..., 10)
+    if (opcode < 0 || opcode > OPCODES.HLT) {
       this.errors.push(
         `Line ${lineNumber}: Invalid opcode ${opcode} at address ${address}`
       );
@@ -147,7 +147,7 @@ export class RamParser {
     address: number,
     lineNumber: number
   ): void {
-    // Instructions 10-90 require valid address operands (000-999)
+    // Instructions 1-9 require valid address operands (000-999)
     if (opcode >= OPCODES.TAKE && opcode <= OPCODES.NULL) {
       if (operand < 0 || operand >= JOHNNY_CONFIG.MEMORY_SIZE) {
         this.errors.push(

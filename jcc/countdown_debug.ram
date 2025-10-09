@@ -1,0 +1,41 @@
+09150 // Initialize CONST_0 = 0
+09151 // Initialize CONST_1 = 0
+07151 // CONST_1 = 1
+09900 // entry: counter = 0
+09901 // result = 0
+09960 // _t0 = 0
+07960 // _t0++
+07960 // _t0++
+07960 // _t0++
+07960 // _t0++
+07960 // _t0++
+01960 // Load _t0
+04900 // counter = _t0
+09961 // _t1 = 0
+01961 // Load _t1
+04901 // result = _t1
+05039 // Jump to while_cond_0 [39]
+09962 // while_cond_0: _t2 = 0
+01900 // Load counter
+03962 // Subtract _t2
+04960 // Save difference
+09963 // _t3 = 0
+06960 // Test difference
+07963 // _t3 = counter != _t2
+06963 // Test _t3 [963]
+05027 // Jump to while_body_1 if _t3 != 0 [27]
+05040 // Jump to while_end_2 [40]
+01901 // while_body_1: Load result
+02900 // Add counter
+04964 // _t4 = result + counter
+01964 // Load _t4
+04901 // result = _t4
+01151 // Load CONST_1
+04965 // _t5 = 1
+01900 // Load counter
+03965 // Subtract _t5
+04966 // _t6 = counter - _t5
+01966 // Load _t6
+04900 // counter = _t6
+05039 // Jump to while_cond_0 [39]
+10000 // while_end_2: Halt program

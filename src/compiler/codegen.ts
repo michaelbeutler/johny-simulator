@@ -12,6 +12,7 @@ import {
   BasicBlock,
 } from './ir';
 import { MemoryMap, MemoryMapper } from './memmap';
+import { OPCODES } from '../core/opcodes';
 
 // Generated instruction with optional label
 export interface GeneratedInstruction {
@@ -65,7 +66,7 @@ export class CodeGenerator {
       if (isFirstInstruction && block.instructions.length === 0) {
         // Add a NOP only if the block is empty
         instructions.push({
-          opcode: 0, // NOP/DATA
+          opcode: OPCODES.DATA, // NOP/DATA
           operand: 0,
           label: block.name,
           comment: `Empty block: ${block.name}`,
@@ -77,7 +78,7 @@ export class CodeGenerator {
     const lastInstr = instructions[instructions.length - 1];
     if (!lastInstr || lastInstr.opcode !== 100) {
       instructions.push({
-        opcode: 100, // HLT
+        opcode: OPCODES.HLT, // HLT
         operand: 0,
         comment: 'Program end',
       });
@@ -92,19 +93,19 @@ export class CodeGenerator {
   ): void {
     // Initialize CONST_0 to 0
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: this.memoryMapper.getAddress(memoryMap, 'CONST_0'),
       comment: 'Initialize CONST_0 = 0',
     });
 
     // Initialize CONST_1 to 1
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: this.memoryMapper.getAddress(memoryMap, 'CONST_1'),
       comment: 'Initialize CONST_1 = 0',
     });
     instructions.push({
-      opcode: 70, // INC
+      opcode: OPCODES.INC, // INC
       operand: this.memoryMapper.getAddress(memoryMap, 'CONST_1'),
       comment: 'CONST_1 = 1',
     });
@@ -144,7 +145,7 @@ export class CodeGenerator {
     if (instr.value === 0) {
       // Use NULL for zero
       instructions.push({
-        opcode: 90, // NULL
+        opcode: OPCODES.NULL, // NULL
         operand: destAddr,
         comment: `${instr.dest} = 0`,
       });
@@ -152,12 +153,12 @@ export class CodeGenerator {
       // Copy CONST_1
       const const1Addr = this.memoryMapper.getAddress(memoryMap, 'CONST_1');
       instructions.push({
-        opcode: 10, // TAKE
+        opcode: OPCODES.TAKE, // TAKE
         operand: const1Addr,
         comment: `Load CONST_1`,
       });
       instructions.push({
-        opcode: 40, // SAVE
+        opcode: OPCODES.SAVE, // SAVE
         operand: destAddr,
         comment: `${instr.dest} = 1`,
       });
@@ -165,13 +166,13 @@ export class CodeGenerator {
       // Generate value using NULL + INC loops for small positive values
       if (instr.value > 0 && instr.value <= 10) {
         instructions.push({
-          opcode: 90, // NULL
+          opcode: OPCODES.NULL, // NULL
           operand: destAddr,
           comment: `${instr.dest} = 0`,
         });
         for (let i = 0; i < instr.value; i++) {
           instructions.push({
-            opcode: 70, // INC
+            opcode: OPCODES.INC, // INC
             operand: destAddr,
             comment: `${instr.dest}++`,
           });
@@ -194,12 +195,12 @@ export class CodeGenerator {
 
     // MOVE src → dest: TAKE src; SAVE dest
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: srcAddr,
       comment: `Load ${instr.src}`,
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = ${instr.src}`,
     });
@@ -218,17 +219,17 @@ export class CodeGenerator {
       case '+':
         // ADD: TAKE left; ADD right; SAVE dest
         instructions.push({
-          opcode: 10, // TAKE
+          opcode: OPCODES.TAKE, // TAKE
           operand: leftAddr,
           comment: `Load ${instr.left}`,
         });
         instructions.push({
-          opcode: 20, // ADD
+          opcode: OPCODES.ADD, // ADD
           operand: rightAddr,
           comment: `Add ${instr.right}`,
         });
         instructions.push({
-          opcode: 40, // SAVE
+          opcode: OPCODES.SAVE, // SAVE
           operand: destAddr,
           comment: `${instr.dest} = ${instr.left} + ${instr.right}`,
         });
@@ -237,17 +238,17 @@ export class CodeGenerator {
       case '-':
         // SUB: TAKE left; SUB right; SAVE dest
         instructions.push({
-          opcode: 10, // TAKE
+          opcode: OPCODES.TAKE, // TAKE
           operand: leftAddr,
           comment: `Load ${instr.left}`,
         });
         instructions.push({
-          opcode: 30, // SUB
+          opcode: OPCODES.SUB, // SUB
           operand: rightAddr,
           comment: `Subtract ${instr.right}`,
         });
         instructions.push({
-          opcode: 40, // SAVE
+          opcode: OPCODES.SAVE, // SAVE
           operand: destAddr,
           comment: `${instr.dest} = ${instr.left} - ${instr.right}`,
         });
@@ -310,24 +311,24 @@ export class CodeGenerator {
 
     // Initialize: PROD = 0, CNT = right
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: prodTemp,
       comment: 'PROD = 0',
     });
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: rightAddr,
       comment: `Load ${instr.right}`,
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: cntTemp,
       comment: 'CNT = right operand',
     });
 
     // Loop start
     instructions.push({
-      opcode: 0, // DATA
+      opcode: OPCODES.DATA, // DATA
       operand: 0,
       label: loopLabel,
       comment: 'Multiplication loop',
@@ -335,35 +336,35 @@ export class CodeGenerator {
 
     // Check if CNT == 0: FLAG = (CNT != 0)
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: flagTemp,
       comment: 'FLAG = 0',
     });
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: cntTemp,
       comment: 'Test CNT',
     });
     instructions.push({
-      opcode: 70, // INC
+      opcode: OPCODES.INC, // INC
       operand: flagTemp,
       comment: 'FLAG = (CNT != 0)',
     });
 
     // If FLAG != 0, continue; else exit
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: flagTemp,
       comment: 'Test FLAG',
     });
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       comment: `Jump to ${addLabel}`,
       label: addLabel,
     });
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       comment: `Jump to ${endLabel}`,
       label: endLabel,
@@ -371,33 +372,33 @@ export class CodeGenerator {
 
     // Add block: PROD += left, CNT--
     instructions.push({
-      opcode: 0, // DATA
+      opcode: OPCODES.DATA, // DATA
       operand: 0,
       label: addLabel,
       comment: 'Add block',
     });
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: prodTemp,
       comment: 'Load PROD',
     });
     instructions.push({
-      opcode: 20, // ADD
+      opcode: OPCODES.ADD, // ADD
       operand: leftAddr,
       comment: `Add ${instr.left}`,
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: prodTemp,
       comment: 'PROD += left',
     });
     instructions.push({
-      opcode: 80, // DEC
+      opcode: OPCODES.DEC, // DEC
       operand: cntTemp,
       comment: 'CNT--',
     });
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       comment: `Jump to ${loopLabel}`,
       label: loopLabel,
@@ -405,18 +406,18 @@ export class CodeGenerator {
 
     // End: move result
     instructions.push({
-      opcode: 0, // DATA
+      opcode: OPCODES.DATA, // DATA
       operand: 0,
       label: endLabel,
       comment: 'End multiplication',
     });
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: prodTemp,
       comment: 'Load result',
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = ${instr.left} * ${instr.right}`,
     });
@@ -444,48 +445,48 @@ export class CodeGenerator {
 
     // EQ(A,B): TAKE A; SUB B; SAVE T; NULL FLAG; TST T; INC FLAG; TAKE CONST_1; SUB FLAG; SAVE FLAG
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: leftAddr,
       comment: `Load ${instr.left}`,
     });
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: rightAddr,
       comment: `Subtract ${instr.right}`,
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: tempAddr,
       comment: 'Save difference',
     });
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: destAddr,
       comment: `${instr.dest} = 0`,
     });
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: tempAddr,
       comment: 'Test difference',
     });
     instructions.push({
-      opcode: 70, // INC
+      opcode: OPCODES.INC, // INC
       operand: destAddr,
       comment: `${instr.dest} = (diff != 0)`,
     });
     // Invert the result: FLAG = 1 - FLAG
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: const1Addr,
       comment: 'Load 1',
     });
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: destAddr,
       comment: 'Subtract flag',
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = ${instr.left} == ${instr.right}`,
     });
@@ -503,32 +504,32 @@ export class CodeGenerator {
 
     // NEQ(A,B): TAKE A; SUB B; SAVE T; NULL FLAG; TST T; INC FLAG
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: leftAddr,
       comment: `Load ${instr.left}`,
     });
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: rightAddr,
       comment: `Subtract ${instr.right}`,
     });
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: tempAddr,
       comment: 'Save difference',
     });
     instructions.push({
-      opcode: 90, // NULL
+      opcode: OPCODES.NULL, // NULL
       operand: destAddr,
       comment: `${instr.dest} = 0`,
     });
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: tempAddr,
       comment: 'Test difference',
     });
     instructions.push({
-      opcode: 70, // INC
+      opcode: OPCODES.INC, // INC
       operand: destAddr,
       comment: `${instr.dest} = ${instr.left} != ${instr.right}`,
     });
@@ -547,17 +548,17 @@ export class CodeGenerator {
         // Negate: dest = 0 - operand
         const const0Addr = this.memoryMapper.getAddress(memoryMap, 'CONST_0');
         instructions.push({
-          opcode: 10, // TAKE
+          opcode: OPCODES.TAKE, // TAKE
           operand: const0Addr,
           comment: 'Load 0',
         });
         instructions.push({
-          opcode: 30, // SUB
+          opcode: OPCODES.SUB, // SUB
           operand: operandAddr,
           comment: `Subtract ${instr.operand}`,
         });
         instructions.push({
-          opcode: 40, // SAVE
+          opcode: OPCODES.SAVE, // SAVE
           operand: destAddr,
           comment: `${instr.dest} = -${instr.operand}`,
         });
@@ -574,7 +575,7 @@ export class CodeGenerator {
     instructions: GeneratedInstruction[]
   ): void {
     instructions.push({
-      opcode: 0, // DATA
+      opcode: OPCODES.DATA, // DATA
       operand: 0,
       label: instr.name,
       comment: `Label: ${instr.name}`,
@@ -586,7 +587,7 @@ export class CodeGenerator {
     instructions: GeneratedInstruction[]
   ): void {
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       comment: `Jump to ${instr.target}`,
       label: instr.target,
@@ -600,12 +601,12 @@ export class CodeGenerator {
     // We need the condition address to test
     // This is handled by the emitter which will resolve the condition symbol
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: 0, // Will be resolved by emitter to condition address
       comment: `Test ${instr.condition}`,
     });
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       comment: `Jump to ${instr.target} if ${instr.condition} != 0`,
       label: instr.target,
@@ -614,7 +615,7 @@ export class CodeGenerator {
 
   private generateHalt(instructions: GeneratedInstruction[]): void {
     instructions.push({
-      opcode: 100, // HLT
+      opcode: OPCODES.HLT, // HLT
       operand: 0,
       comment: 'Halt program',
     });
@@ -633,41 +634,41 @@ export class CodeGenerator {
 
     // Load left value
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: leftAddr,
       comment: `Load ${instr.left}`,
     });
 
     // Subtract right value
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: rightAddr,
       comment: `Subtract ${instr.right}`,
     });
 
     // Save difference
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: tempAddr,
       comment: 'Save difference',
     });
 
     // Test if positive (greater than 0)
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: tempAddr,
       comment: `Test if ${instr.left} > ${instr.right}`,
     });
 
     // Store 1 in dest (will be overwritten if false)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 151, // CONST_1
       comment: 'Load 1 (true)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = true`,
     });
@@ -675,7 +676,7 @@ export class CodeGenerator {
     // Skip next instruction if test was true (positive)
     const skipLabel = `gt_skip_${this.nextLabelId++}`;
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       label: skipLabel,
       comment: 'Jump if positive',
@@ -683,20 +684,20 @@ export class CodeGenerator {
 
     // Store 0 in dest (false case)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 150, // CONST_0
       comment: 'Load 0 (false)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = false`,
     });
 
     // Skip target
     instructions.push({
-      opcode: 90, // NULL (no-op)
+      opcode: OPCODES.NULL, // NULL (no-op)
       operand: 0,
       comment: skipLabel,
     });
@@ -729,41 +730,41 @@ export class CodeGenerator {
 
     // Load right value (instr.right)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: leftAddr,
       comment: `Load ${instr.right}`,
     });
 
     // Subtract left value (instr.left)
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: rightAddr,
       comment: `Subtract ${instr.left}`,
     });
 
     // Save difference
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: tempAddr,
       comment: 'Save difference',
     });
 
     // Test if positive (right > left, i.e., left < right)
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: tempAddr,
       comment: `Test if ${instr.right} > ${instr.left}`,
     });
 
     // Store 0 in dest (will be overwritten with 1 if false - inverted logic)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 150, // CONST_0
       comment: 'Load 0 (false)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = false`,
     });
@@ -771,7 +772,7 @@ export class CodeGenerator {
     // Skip next instruction if test was true (right > left, so left NOT >= right)
     const skipLabel = `ge_skip_${this.nextLabelId++}`;
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       label: skipLabel,
       comment: 'Jump if right > left',
@@ -779,20 +780,20 @@ export class CodeGenerator {
 
     // Store 1 in dest (true case - left >= right)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 151, // CONST_1
       comment: 'Load 1 (true)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = true`,
     });
 
     // Skip target
     instructions.push({
-      opcode: 90, // NULL (no-op)
+      opcode: OPCODES.NULL, // NULL (no-op)
       operand: 0,
       comment: skipLabel,
     });
@@ -812,41 +813,41 @@ export class CodeGenerator {
 
     // Load left value
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: leftAddr,
       comment: `Load ${instr.left}`,
     });
 
     // Subtract right value
     instructions.push({
-      opcode: 30, // SUB
+      opcode: OPCODES.SUB, // SUB
       operand: rightAddr,
       comment: `Subtract ${instr.right}`,
     });
 
     // Save difference
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: tempAddr,
       comment: 'Save difference',
     });
 
     // Test if positive (left > right)
     instructions.push({
-      opcode: 60, // TST
+      opcode: OPCODES.TST, // TST
       operand: tempAddr,
       comment: `Test if ${instr.left} > ${instr.right}`,
     });
 
     // Store 0 in dest (will be overwritten with 1 if false - inverted logic)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 150, // CONST_0
       comment: 'Load 0 (false)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = false`,
     });
@@ -854,7 +855,7 @@ export class CodeGenerator {
     // Skip next instruction if test was true (left > right, so left NOT <= right)
     const skipLabel = `le_skip_${this.nextLabelId++}`;
     instructions.push({
-      opcode: 50, // JMP
+      opcode: OPCODES.JMP, // JMP
       operand: 0, // Will be resolved by emitter
       label: skipLabel,
       comment: 'Jump if left > right',
@@ -862,20 +863,20 @@ export class CodeGenerator {
 
     // Store 1 in dest (true case - left <= right)
     instructions.push({
-      opcode: 10, // TAKE
+      opcode: OPCODES.TAKE, // TAKE
       operand: 151, // CONST_1
       comment: 'Load 1 (true)',
     });
 
     instructions.push({
-      opcode: 40, // SAVE
+      opcode: OPCODES.SAVE, // SAVE
       operand: destAddr,
       comment: `${instr.dest} = true`,
     });
 
     // Skip target
     instructions.push({
-      opcode: 90, // NULL (no-op)
+      opcode: OPCODES.NULL, // NULL (no-op)
       operand: 0,
       comment: skipLabel,
     });

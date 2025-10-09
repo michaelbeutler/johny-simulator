@@ -315,13 +315,13 @@ export class MermaidFlowchartGenerator {
       switch (node.opcode) {
         case 20: // ADD
         case 30: // SUB
-        case 70: // INC
+        case 7: // INC
         case 80: // DEC
           categories.arithmetic.push(node.address);
           break;
         case 10: // TAKE
-        case 40: // SAVE
-        case 90: // NULL
+        case 4: // SAVE
+        case 9: // NULL
           categories.memory.push(node.address);
           break;
         case 50: // JMP
@@ -604,7 +604,7 @@ export class MermaidFlowchartGenerator {
     const node = nodes.find(n => n.address === startAddr);
     const nextNode = nodes.find(n => n.address === startAddr + 1);
 
-    return node?.opcode === 10 && nextNode?.opcode === 40; // TAKE + SAVE
+    return node?.opcode === 1 && nextNode?.opcode === 4; // TAKE + SAVE
   }
 
   private createInitializationBlock(
@@ -620,7 +620,7 @@ export class MermaidFlowchartGenerator {
       const takeNode = nodes.find(n => n.address === addr);
       const saveNode = nodes.find(n => n.address === addr + 1);
 
-      if (takeNode?.opcode === 10 && saveNode?.opcode === 40) {
+      if (takeNode?.opcode === 1 && saveNode?.opcode === 4) {
         addresses.push(addr, addr + 1);
         addr += 2;
       } else {
@@ -644,7 +644,7 @@ export class MermaidFlowchartGenerator {
     const node = nodes.find(n => n.address === startAddr);
     const nextNode = nodes.find(n => n.address === startAddr + 1);
 
-    return node?.opcode === 90 && nextNode?.opcode === 90; // NULL + NULL
+    return node?.opcode === 9 && nextNode?.opcode === 9; // NULL + NULL
   }
 
   private createArrayClearingBlock(
@@ -658,7 +658,7 @@ export class MermaidFlowchartGenerator {
     // Collect consecutive NULL instructions
     while (addr < nodes.length) {
       const node = nodes.find(n => n.address === addr);
-      if (node?.opcode === 90) {
+      if (node?.opcode === 9) {
         // NULL
         addresses.push(addr);
         addr++;
@@ -718,7 +718,7 @@ export class MermaidFlowchartGenerator {
     // Analyze loop body to create description
     const hasIncrement = addresses.some(a => {
       const node = nodes.find(n => n.address === a);
-      return node?.opcode === 70; // INC
+      return node?.opcode === 7; // INC
     });
 
     const hasTest = addresses.some(a => {

@@ -134,10 +134,11 @@ export class Emitter {
   }
 
   private encodeInstruction(opcode: number, operand: number): number {
-    // Encode as: opcode*1000 + operand
-    // But first convert opcode from 10s to instruction format
-    const instructionOpcode = opcode / 10; // Convert 10,20,30... to 1,2,3...
-    return instructionOpcode * 1000 + operand;
+    // Encode as: opcode (zero-padded to 2 digits) + operand (zero-padded to 3 digits)
+    // Format: OOXXX where OO is 2-digit opcode, XXX is 3-digit operand
+    const paddedOpcode = opcode.toString().padStart(2, '0');
+    const paddedOperand = operand.toString().padStart(3, '0');
+    return parseInt(paddedOpcode + paddedOperand);
   }
 
   private formatComment(
@@ -154,16 +155,16 @@ export class Emitter {
     // Generate default comment based on opcode
     const opcodeNames: Record<number, string> = {
       0: 'DATA',
-      10: 'TAKE',
-      20: 'ADD',
-      30: 'SUB',
-      40: 'SAVE',
-      50: 'JMP',
-      60: 'TST',
-      70: 'INC',
-      80: 'DEC',
-      90: 'NULL',
-      100: 'HLT',
+      1: 'TAKE',
+      2: 'ADD',
+      3: 'SUB',
+      4: 'SAVE',
+      5: 'JMP',
+      6: 'TST',
+      7: 'INC',
+      8: 'DEC',
+      9: 'NULL',
+      10: 'HLT',
     };
 
     const opcodeName = opcodeNames[instr.opcode] || `OP${instr.opcode}`;
@@ -188,7 +189,7 @@ export class Emitter {
     // Check for halt instruction
     const hasHalt = emitted.instructions.some(instr => {
       const opcode = Math.floor(instr / 1000);
-      return opcode === 10; // HLT opcode is 100, which becomes 10 when divided by 10
+      return opcode === 10; // HLT opcode is 10 in OOXXX format
     });
 
     if (!hasHalt) {

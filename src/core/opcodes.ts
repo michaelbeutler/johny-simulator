@@ -11,16 +11,16 @@ export const JOHNNY_CONFIG = {
 // Opcode constants
 export const OPCODES = {
   DATA: 0,
-  TAKE: 10,
-  ADD: 20,
-  SUB: 30,
-  SAVE: 40,
-  JMP: 50,
-  TST: 60,
-  INC: 70,
-  DEC: 80,
-  NULL: 90,
-  HLT: 100,
+  TAKE: 1,
+  ADD: 2,
+  SUB: 3,
+  SAVE: 4,
+  JMP: 5,
+  TST: 6,
+  INC: 7,
+  DEC: 8,
+  NULL: 9,
+  HLT: 10,
 } as const;
 
 export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {

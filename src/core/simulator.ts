@@ -73,8 +73,8 @@ export class JohnnySimulator {
     }
 
     const instruction = state.ram[state.pc];
-    // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
-    const opcode = Math.floor((instruction || 0) / 1000) * 10;
+    // Extract opcode: Math.floor(instruction / 1000)
+    const opcode = Math.floor((instruction || 0) / 1000);
     // Extract operand: last 3 digits
     const operand = (instruction || 0) % 1000;
 
