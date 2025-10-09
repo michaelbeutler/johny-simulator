@@ -1,5 +1,5 @@
 // JOHNNY RAM Program Parser with improved syntax handling
-import { JOHNNY_CONFIG } from './opcodes';
+import { JOHNNY_CONFIG, OPCODES } from './opcodes';
 
 export interface ParseResult {
   ram: number[];
@@ -127,7 +127,7 @@ export class RamParser {
     const operand = value % 1000; // Last 3 digits
 
     // Validate opcode range (0, 10, 20, ..., 100)
-    if (opcode < 0 || opcode > 100 || opcode % 10 !== 0) {
+    if (opcode < 0 || opcode > OPCODES.HLT || opcode % 10 !== 0) {
       this.errors.push(
         `Line ${lineNumber}: Invalid opcode ${opcode} at address ${address}`
       );
@@ -148,7 +148,7 @@ export class RamParser {
     lineNumber: number
   ): void {
     // Instructions 10-90 require valid address operands (000-999)
-    if (opcode >= 10 && opcode <= 90) {
+    if (opcode >= OPCODES.TAKE && opcode <= OPCODES.NULL) {
       if (operand < 0 || operand >= JOHNNY_CONFIG.MEMORY_SIZE) {
         this.errors.push(
           `Line ${lineNumber}: Invalid address operand ${operand.toString().padStart(3, '0')} for opcode ${opcode} at address ${address}`
@@ -157,7 +157,7 @@ export class RamParser {
     }
 
     // HLT (opcode 100) should ideally have operand 000
-    if (opcode === 100 && operand !== 0) {
+    if (opcode === OPCODES.HLT && operand !== 0) {
       this.warnings.push(
         `Line ${lineNumber}: HLT instruction ignores operand; received ${operand.toString().padStart(3, '0')} at address ${address}`
       );

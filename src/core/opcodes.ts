@@ -8,8 +8,23 @@ export const JOHNNY_CONFIG = {
   INSTRUCTION_FORMAT: 5, // 5-digit instructions (OOXXX format)
 } as const;
 
+// Opcode constants
+export const OPCODES = {
+  DATA: 0,
+  TAKE: 10,
+  ADD: 20,
+  SUB: 30,
+  SAVE: 40,
+  JMP: 50,
+  TST: 60,
+  INC: 70,
+  DEC: 80,
+  NULL: 90,
+  HLT: 100,
+} as const;
+
 export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
-  0: {
+  [OPCODES.DATA]: {
     name: 'DATA',
     description: 'Data word (no operation)',
     hasOperand: false,
@@ -18,7 +33,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       // Data word - no operation, just increment PC
     },
   },
-  10: {
+  [OPCODES.TAKE]: {
     name: 'TAKE',
     description: 'Load value from memory address into accumulator',
     hasOperand: true,
@@ -27,7 +42,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.acc = state.ram[operand] || 0; // Handle undefined/null values
     },
   },
-  20: {
+  [OPCODES.ADD]: {
     name: 'ADD',
     description: 'Add value from memory address to accumulator',
     hasOperand: true,
@@ -39,7 +54,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
         state.acc = JOHNNY_CONFIG.MAX_VALUE;
     },
   },
-  30: {
+  [OPCODES.SUB]: {
     name: 'SUB',
     description: 'Subtract value from memory address from accumulator',
     hasOperand: true,
@@ -50,7 +65,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       if (state.acc < 0) state.acc = 0;
     },
   },
-  40: {
+  [OPCODES.SAVE]: {
     name: 'SAVE',
     description: 'Store accumulator value to memory address',
     hasOperand: true,
@@ -59,7 +74,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = state.acc;
     },
   },
-  50: {
+  [OPCODES.JMP]: {
     name: 'JMP',
     description: 'Jump to memory address',
     hasOperand: true,
@@ -68,7 +83,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.pc = operand; // Jump directly to the address
     },
   },
-  60: {
+  [OPCODES.TST]: {
     name: 'TST',
     description: 'Skip next instruction if memory address contains zero',
     hasOperand: true,
@@ -79,7 +94,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       }
     },
   },
-  70: {
+  [OPCODES.INC]: {
     name: 'INC',
     description: 'Increment value at memory address',
     hasOperand: true,
@@ -89,7 +104,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = (currentValue + 1) % (JOHNNY_CONFIG.MAX_VALUE + 1);
     },
   },
-  80: {
+  [OPCODES.DEC]: {
     name: 'DEC',
     description: 'Decrement value at memory address',
     hasOperand: true,
@@ -99,7 +114,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = Math.max(0, currentValue - 1);
     },
   },
-  90: {
+  [OPCODES.NULL]: {
     name: 'NULL',
     description: 'Set memory address to zero',
     hasOperand: true,
@@ -108,7 +123,7 @@ export const DEFAULT_OPCODE_MAPPING: OpcodeMapping = {
       state.ram[operand] = 0;
     },
   },
-  100: {
+  [OPCODES.HLT]: {
     name: 'HLT',
     description: 'Halt program execution',
     hasOperand: false,

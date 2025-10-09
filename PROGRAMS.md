@@ -1,35 +1,55 @@
 # JOHNNY RAM Programs
 
-_Auto-generated documentation_
+This document provides an overview of all available JOHNNY RAM programs.
 
-## 📊 Summary
+## Program Summary
 
-- **Total Programs:** 5
-- **Valid Programs:** 5/5
-- **Total Instructions:** 116
+| Program                               | Status | Instructions | Memory Used | Tests |
+| ------------------------------------- | ------ | ------------ | ----------- | ----- |
+| [sieve.ram](scripts/sieve.md)         | ✅     | 35           | 0-38        | 0/0   |
+| [addition.ram](scripts/addition.md)   | ✅     | 4            | 0-102       | 0/0   |
+| [idiv.ram](scripts/idiv.md)           | ✅     | 23           | 0-22        | 0/0   |
+| [countdown.ram](scripts/countdown.md) | ✅     | 44           | 0-43        | 0/0   |
+| [multiply.ram](scripts/multiply.md)   | ✅     | 10           | 0-9         | 0/0   |
 
-## 📁 Programs
+## Programs
 
-| Program                           | Status | Instructions | Tests | Description      |
-| --------------------------------- | ------ | ------------ | ----- | ---------------- |
-| [sieve](scripts/sieve.md)         | ✅     | 35           | 4/4   | _Auto-generated_ |
-| [addition](scripts/addition.md)   | ✅     | 4            | 9/9   | _Auto-generated_ |
-| [idiv](scripts/idiv.md)           | ✅     | 23           | 12/12 | _Auto-generated_ |
-| [countdown](scripts/countdown.md) | ✅     | 44           | 4/4   | _Auto-generated_ |
-| [multiply](scripts/multiply.md)   | ✅     | 10           | 5/5   | _Auto-generated_ |
+### sieve
 
-## 🛠️ JOHNNY Instruction Set
+✅ **Status:** Valid
+📊 **Stats:** 35 instructions, 4 data words
+🧪 **Tests:** 0/0 passed
 
-| Opcode | Name  | Description                  |
-| ------ | ----- | ---------------------------- |
-| 00     | FETCH | Fetch instruction (internal) |
-| 01     | TAKE  | Load mem[addr] into ACC      |
-| 02     | ADD   | ACC = ACC + mem[addr]        |
-| 03     | SUB   | ACC = ACC - mem[addr]        |
-| 04     | SAVE  | mem[addr] = ACC              |
-| 05     | JMP   | Jump to addr                 |
-| 06     | TST   | Skip next if mem[addr] = 0   |
-| 07     | INC   | mem[addr] = mem[addr] + 1    |
-| 08     | DEC   | mem[addr] = mem[addr] - 1    |
-| 09     | NULL  | mem[addr] = 0                |
-| 10     | HLT   | Halt program                 |
+📄 [View Documentation](scripts/sieve.md)
+
+### addition
+
+✅ **Status:** Valid
+📊 **Stats:** 4 instructions, 3 data words
+🧪 **Tests:** 0/0 passed
+
+📄 [View Documentation](scripts/addition.md)
+
+### idiv
+
+✅ **Status:** Valid
+📊 **Stats:** 23 instructions, 0 data words
+🧪 **Tests:** 0/0 passed
+
+📄 [View Documentation](scripts/idiv.md)
+
+### countdown
+
+✅ **Status:** Valid
+📊 **Stats:** 44 instructions, 0 data words
+🧪 **Tests:** 0/0 passed
+
+📄 [View Documentation](scripts/countdown.md)
+
+### multiply
+
+✅ **Status:** Valid
+📊 **Stats:** 10 instructions, 0 data words
+🧪 **Tests:** 0/0 passed
+
+📄 [View Documentation](scripts/multiply.md)

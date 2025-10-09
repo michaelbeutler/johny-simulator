@@ -6,7 +6,11 @@ import * as path from 'path';
 const chalk = require('chalk');
 import { RamValidator } from '../validation/validator';
 import { RamParser } from '../core/parser';
-import { getInstructionName, DEFAULT_OPCODE_MAPPING } from '../core/opcodes';
+import {
+  getInstructionName,
+  DEFAULT_OPCODE_MAPPING,
+  OPCODES,
+} from '../core/opcodes';
 
 class ValidatorCLI {
   private validator: RamValidator;
@@ -203,13 +207,13 @@ class ValidatorCLI {
     for (let addr = 0; addr < maxAddr; addr++) {
       const value = ram[addr];
       if (value !== 0 || addr <= lastNonZero) {
-        const opcode = Math.floor(value / 1000);
+        const opcode = Math.floor(value / 1000) * 10;
         const operand = value % 1000;
 
         let instruction = '';
         let comment = '';
 
-        if (opcode === 0) {
+        if (opcode === OPCODES.DATA) {
           instruction = 'DATA';
           comment = `Value: ${value}`;
         } else if (DEFAULT_OPCODE_MAPPING[opcode]) {
@@ -217,34 +221,34 @@ class ValidatorCLI {
           instruction = `${opcodeInfo.name} ${operand.toString().padStart(3, '0')}`;
 
           switch (opcode) {
-            case 1:
+            case OPCODES.TAKE:
               comment = `Load mem[${operand}] into ACC`;
               break;
-            case 2:
+            case OPCODES.ADD:
               comment = `ACC = ACC + mem[${operand}]`;
               break;
-            case 3:
+            case OPCODES.SUB:
               comment = `ACC = ACC - mem[${operand}]`;
               break;
-            case 4:
+            case OPCODES.SAVE:
               comment = `mem[${operand}] = ACC`;
               break;
-            case 5:
+            case OPCODES.JMP:
               comment = `Jump to address ${operand}`;
               break;
-            case 6:
+            case OPCODES.TST:
               comment = `Skip next if mem[${operand}] = 0`;
               break;
-            case 7:
+            case OPCODES.INC:
               comment = `mem[${operand}] = mem[${operand}] + 1`;
               break;
-            case 8:
+            case OPCODES.DEC:
               comment = `mem[${operand}] = mem[${operand}] - 1`;
               break;
-            case 9:
+            case OPCODES.NULL:
               comment = `mem[${operand}] = 0`;
               break;
-            case 10:
+            case OPCODES.HLT:
               comment = `Halt program`;
               break;
           }

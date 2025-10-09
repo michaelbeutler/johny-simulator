@@ -10,6 +10,7 @@ import {
   DEFAULT_OPCODE_MAPPING,
   JOHNNY_CONFIG,
   isValidOpcode,
+  OPCODES,
 } from '../core/opcodes';
 import { RamParser } from '../core/parser';
 
@@ -80,7 +81,7 @@ export class RamValidator {
       }
 
       // Skip validation for data words (opcode 0)
-      if (opcode === 0) continue;
+      if (opcode === OPCODES.DATA) continue;
 
       // Validate opcode
       if (!isValidOpcode(opcode, this.opcodeMapping)) {
@@ -127,7 +128,7 @@ export class RamValidator {
     if (!opcodeInfo) return;
 
     // Instructions 10-90 require valid address operands (000-999)
-    if (opcode >= 10 && opcode <= 90) {
+    if (opcode >= OPCODES.TAKE && opcode <= OPCODES.NULL) {
       if (operand < 0 || operand >= JOHNNY_CONFIG.MEMORY_SIZE) {
         errors.push({
           type: 'SYNTAX',
@@ -139,7 +140,7 @@ export class RamValidator {
     }
 
     // HLT should have operand 000
-    if (opcode === 10 && operand !== 0) {
+    if (opcode === OPCODES.HLT && operand !== 0) {
       warnings.push({
         type: 'STYLE',
         address: address,
@@ -166,21 +167,21 @@ export class RamValidator {
       const value = ram[addr];
       if (value === 0) continue;
 
-      const instructionStr = value.toString().padStart(5, '0');
-      const opcode = parseInt(instructionStr.slice(0, 2), 10);
-      const operand = parseInt(instructionStr.slice(2), 10);
+      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
+      const opcode = Math.floor(value / 1000) * 10;
+      const operand = value % 1000;
 
-      if (opcode === 0) {
+      if (opcode === OPCODES.DATA) {
         dataWords++;
       } else {
         totalInstructions++;
         instructionCount[opcode] = (instructionCount[opcode] || 0) + 1;
 
-        if (opcode === 10) {
+        if (opcode === OPCODES.HLT) {
           hasHalt = true;
         }
 
-        if (opcode === 5 && operand === addr) {
+        if (opcode === OPCODES.JMP && operand === addr) {
           potentialInfiniteLoops++;
         }
       }
@@ -209,7 +210,7 @@ export class RamValidator {
     warnings: ValidationWarning[]
   ): void {
     // Check for JMP to same address (only warn if no HLT in program)
-    if (opcode === 5 && operand === address) {
+    if (opcode === OPCODES.JMP && operand === address) {
       const hasHalt = this.programHasHalt(ram);
       if (!hasHalt) {
         warnings.push({
@@ -257,9 +258,9 @@ export class RamValidator {
    */
   private programHasHalt(ram: number[]): boolean {
     return ram.some(value => {
-      const instructionStr = value.toString().padStart(5, '0');
-      const opcode = parseInt(instructionStr.slice(0, 2), 10);
-      return opcode === 10;
+      // Extract opcode like original simulator: Math.floor(instruction / 1000) * 10
+      const opcode = Math.floor(value / 1000) * 10;
+      return opcode === OPCODES.HLT;
     });
   }
 
