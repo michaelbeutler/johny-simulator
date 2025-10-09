@@ -1,0 +1,17 @@
+// Nested if statements example
+int value;
+int category;
+
+value = 8;
+
+if (value == 5) {
+    category = 1;
+} else {
+    if (value == 8) {
+        category = 2;
+    } else {
+        category = 3;
+    }
+}
+
+halt;

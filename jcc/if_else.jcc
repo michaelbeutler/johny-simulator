@@ -1,0 +1,13 @@
+// Simple if-else conditional example
+int x;
+int result;
+
+x = 7;
+
+if (x == 7) {
+    result = 10;
+} else {
+    result = 5;
+}
+
+halt;

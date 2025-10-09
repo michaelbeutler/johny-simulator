@@ -24,6 +24,7 @@ export interface GeneratedInstruction {
 export class CodeGenerator {
   private memoryMapper: MemoryMapper;
   private nextLabelId = 0;
+  private nextTempId = 0;
   private tempAllocator = new Map<string, number>(); // Reuse temps per block
 
   constructor(memoryMapper: MemoryMapper) {
@@ -252,6 +253,22 @@ export class CodeGenerator {
 
       case '!=':
         this.generateNotEquals(instr, instructions, memoryMap);
+        break;
+
+      case '>':
+        this.generateGreaterThan(instr, instructions, memoryMap);
+        break;
+
+      case '<':
+        this.generateLessThan(instr, instructions, memoryMap);
+        break;
+
+      case '>=':
+        this.generateGreaterEqual(instr, instructions, memoryMap);
+        break;
+
+      case '<=':
+        this.generateLessEqual(instr, instructions, memoryMap);
         break;
 
       default:
@@ -586,6 +603,267 @@ export class CodeGenerator {
       opcode: 100, // HLT
       operand: 0,
       comment: 'Halt program',
+    });
+  }
+
+  private generateGreaterThan(
+    instr: IRBinary,
+    instructions: GeneratedInstruction[],
+    memoryMap: MemoryMap
+  ): void {
+    // a > b  =>  a - b > 0 (positive test)
+    const leftAddr = this.memoryMapper.getAddress(memoryMap, instr.left);
+    const rightAddr = this.memoryMapper.getAddress(memoryMap, instr.right);
+    const destAddr = this.memoryMapper.getAddress(memoryMap, instr.dest);
+    const tempAddr = this.getTempAddress(memoryMap, '_cmp_temp');
+
+    // Load left value
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: leftAddr,
+      comment: `Load ${instr.left}`,
+    });
+
+    // Subtract right value
+    instructions.push({
+      opcode: 30, // SUB
+      operand: rightAddr,
+      comment: `Subtract ${instr.right}`,
+    });
+
+    // Save difference
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: tempAddr,
+      comment: 'Save difference',
+    });
+
+    // Test if positive (greater than 0)
+    instructions.push({
+      opcode: 60, // TST
+      operand: tempAddr,
+      comment: `Test if ${instr.left} > ${instr.right}`,
+    });
+
+    // Store 1 in dest (will be overwritten if false)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 151, // CONST_1
+      comment: 'Load 1 (true)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = true`,
+    });
+
+    // Skip next instruction if test was true (positive)
+    const skipLabel = `gt_skip_${this.nextLabelId++}`;
+    instructions.push({
+      opcode: 50, // JMP
+      operand: 0, // Will be resolved by emitter
+      label: skipLabel,
+      comment: 'Jump if positive',
+    });
+
+    // Store 0 in dest (false case)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 150, // CONST_0
+      comment: 'Load 0 (false)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = false`,
+    });
+
+    // Skip target
+    instructions.push({
+      opcode: 90, // NULL (no-op)
+      operand: 0,
+      comment: skipLabel,
+    });
+  }
+
+  private generateLessThan(
+    instr: IRBinary,
+    instructions: GeneratedInstruction[],
+    memoryMap: MemoryMap
+  ): void {
+    // a < b  =>  b > a (swap operands)
+    const swappedInstr: IRBinary = {
+      ...instr,
+      left: instr.right,
+      right: instr.left,
+    };
+    this.generateGreaterThan(swappedInstr, instructions, memoryMap);
+  }
+
+  private generateGreaterEqual(
+    instr: IRBinary,
+    instructions: GeneratedInstruction[],
+    memoryMap: MemoryMap
+  ): void {
+    // a >= b  =>  !(b > a)
+    const leftAddr = this.memoryMapper.getAddress(memoryMap, instr.right);
+    const rightAddr = this.memoryMapper.getAddress(memoryMap, instr.left);
+    const destAddr = this.memoryMapper.getAddress(memoryMap, instr.dest);
+    const tempAddr = this.getTempAddress(memoryMap, '_cmp_temp');
+
+    // Load right value (instr.right)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: leftAddr,
+      comment: `Load ${instr.right}`,
+    });
+
+    // Subtract left value (instr.left)
+    instructions.push({
+      opcode: 30, // SUB
+      operand: rightAddr,
+      comment: `Subtract ${instr.left}`,
+    });
+
+    // Save difference
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: tempAddr,
+      comment: 'Save difference',
+    });
+
+    // Test if positive (right > left, i.e., left < right)
+    instructions.push({
+      opcode: 60, // TST
+      operand: tempAddr,
+      comment: `Test if ${instr.right} > ${instr.left}`,
+    });
+
+    // Store 0 in dest (will be overwritten with 1 if false - inverted logic)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 150, // CONST_0
+      comment: 'Load 0 (false)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = false`,
+    });
+
+    // Skip next instruction if test was true (right > left, so left NOT >= right)
+    const skipLabel = `ge_skip_${this.nextLabelId++}`;
+    instructions.push({
+      opcode: 50, // JMP
+      operand: 0, // Will be resolved by emitter
+      label: skipLabel,
+      comment: 'Jump if right > left',
+    });
+
+    // Store 1 in dest (true case - left >= right)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 151, // CONST_1
+      comment: 'Load 1 (true)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = true`,
+    });
+
+    // Skip target
+    instructions.push({
+      opcode: 90, // NULL (no-op)
+      operand: 0,
+      comment: skipLabel,
+    });
+  }
+
+  private generateLessEqual(
+    instr: IRBinary,
+    instructions: GeneratedInstruction[],
+    memoryMap: MemoryMap
+  ): void {
+    // a <= b  =>  !(a > b)
+    // Use the same approach as greater than, but with inverted logic
+    const leftAddr = this.memoryMapper.getAddress(memoryMap, instr.left);
+    const rightAddr = this.memoryMapper.getAddress(memoryMap, instr.right);
+    const destAddr = this.memoryMapper.getAddress(memoryMap, instr.dest);
+    const tempAddr = this.getTempAddress(memoryMap, '_cmp_temp');
+
+    // Load left value
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: leftAddr,
+      comment: `Load ${instr.left}`,
+    });
+
+    // Subtract right value
+    instructions.push({
+      opcode: 30, // SUB
+      operand: rightAddr,
+      comment: `Subtract ${instr.right}`,
+    });
+
+    // Save difference
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: tempAddr,
+      comment: 'Save difference',
+    });
+
+    // Test if positive (left > right)
+    instructions.push({
+      opcode: 60, // TST
+      operand: tempAddr,
+      comment: `Test if ${instr.left} > ${instr.right}`,
+    });
+
+    // Store 0 in dest (will be overwritten with 1 if false - inverted logic)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 150, // CONST_0
+      comment: 'Load 0 (false)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = false`,
+    });
+
+    // Skip next instruction if test was true (left > right, so left NOT <= right)
+    const skipLabel = `le_skip_${this.nextLabelId++}`;
+    instructions.push({
+      opcode: 50, // JMP
+      operand: 0, // Will be resolved by emitter
+      label: skipLabel,
+      comment: 'Jump if left > right',
+    });
+
+    // Store 1 in dest (true case - left <= right)
+    instructions.push({
+      opcode: 10, // TAKE
+      operand: 151, // CONST_1
+      comment: 'Load 1 (true)',
+    });
+
+    instructions.push({
+      opcode: 40, // SAVE
+      operand: destAddr,
+      comment: `${instr.dest} = true`,
+    });
+
+    // Skip target
+    instructions.push({
+      opcode: 90, // NULL (no-op)
+      operand: 0,
+      comment: skipLabel,
     });
   }
 

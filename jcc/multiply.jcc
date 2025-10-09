@@ -1,0 +1,10 @@
+// Multiplication example (3 * 4 = 12)
+int x;
+int y;
+int product;
+
+x = 3;
+y = 4;
+product = x * y;
+
+halt;

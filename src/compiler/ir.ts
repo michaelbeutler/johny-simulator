@@ -11,6 +11,7 @@ import {
   BinaryExpression,
   UnaryExpression,
   NumberLiteral,
+  BooleanLiteral,
   Identifier,
 } from './parser';
 
@@ -268,6 +269,12 @@ export class IRGenerator {
     if (expr instanceof NumberLiteral) {
       const temp = this.newTemp();
       this.emit(new IRConstant(this.nextInstrId++, temp, expr.value));
+      return temp;
+    }
+
+    if (expr instanceof BooleanLiteral) {
+      const temp = this.newTemp();
+      this.emit(new IRConstant(this.nextInstrId++, temp, expr.value ? 1 : 0));
       return temp;
     }
 

@@ -1,0 +1,13 @@
+// While loop countdown example
+int counter;
+int result;
+
+counter = 5;
+result = 0;
+
+while (counter != 0) {
+    result = result + counter;
+    counter = counter - 1;
+}
+
+halt;

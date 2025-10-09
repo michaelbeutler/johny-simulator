@@ -1,0 +1,19 @@
+// Test Johnny C program - demonstrates all basic features
+int a;
+int b; 
+int sum;
+int product;
+bool isPositive;
+
+a = 3;
+b = 2;
+sum = a + b;
+product = a * b;
+
+if (sum > 4) {
+    isPositive = true;
+} else {
+    isPositive = false;
+}
+
+halt;

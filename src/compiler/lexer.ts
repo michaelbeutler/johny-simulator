@@ -11,6 +11,8 @@ export enum TokenType {
   ELSE = 'ELSE',
   WHILE = 'WHILE',
   HALT = 'HALT',
+  TRUE = 'TRUE',
+  FALSE = 'FALSE',
 
   // Operators
   PLUS = 'PLUS',
@@ -245,6 +247,8 @@ export class Lexer {
       else: TokenType.ELSE,
       while: TokenType.WHILE,
       halt: TokenType.HALT,
+      true: TokenType.TRUE,
+      false: TokenType.FALSE,
     };
     return keywords[text] || null;
   }

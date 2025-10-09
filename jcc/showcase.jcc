@@ -1,0 +1,38 @@
+// Johnny C Showcase Program
+// This program demonstrates all major features of the Johnny C language
+
+int a;          // Variable declarations
+int b;
+int sum;
+int product;
+int comparison;
+bool flag1;
+bool flag2;
+
+// Basic arithmetic
+a = 3;
+b = 4;
+sum = a + b;        // Addition: sum = 7
+product = a * b;    // Multiplication: product = 12
+
+// Comparison operators
+if (sum > 6) {                  // Greater than
+    flag1 = true;
+} else {
+    flag1 = false;
+}
+
+if (a <= b) {                   // Less than or equal
+    flag2 = true;
+} else {
+    flag2 = false;
+}
+
+// More complex comparison
+if (product >= 10) {            // Greater than or equal
+    comparison = 1;
+} else {
+    comparison = 0;
+}
+
+halt;

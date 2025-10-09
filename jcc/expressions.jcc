@@ -1,0 +1,16 @@
+// Complex arithmetic expressions
+int a;
+int b;
+int c;
+int result1;
+int result2;
+
+a = 2;
+b = 3;
+c = 4;
+
+// Parentheses for precedence
+result1 = (a + b) * c;  // Should be (2+3)*4 = 20 (but limited by our constants)
+result2 = a + (b * c);  // Should be 2+(3*4) = 14 (but limited by our constants)  
+
+halt;

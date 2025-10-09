@@ -1,6 +1,6 @@
 # JOHNNY RAM Validator & Simulator
 
-A comprehensive TypeScript + Bun implementation of the JOHNNY computer simulator with automated testing, validation, and documentation generation.
+A comprehensive TypeScript + Bun implementation of the JOHNNY computer simulator with automated testing, validation, documentation generation, and a complete Johnny C compiler.
 
 ## 🚀 Quick Start
 
@@ -11,15 +11,133 @@ bun install
 # Run all tests
 bun test
 
-# Generate documentation
-bun run docs
+# Compile Johnny C to JOHNNY RAM
+bun run compile jcc/simple_add.jcc
 
 # Validate a specific program
 bun run validate scripts/multiply.ram
 
 # Simulate a program interactively
 bun run simulate scripts/addition.ram
+
+# Generate documentation
+bun run docs
 ```
+
+## 🔧 Johnny C Compiler
+
+Johnny C is a C-like language that compiles to JOHNNY RAM assembly. It supports variables, arithmetic, conditionals, loops, and basic expressions.
+
+### Syntax Guide
+
+#### Variable Declarations
+
+```c
+int x;          // Declare integer variable
+bool flag;      // Declare boolean variable
+```
+
+#### Assignments
+
+```c
+x = 5;          // Assign constant
+y = x + 2;      // Assign expression result
+flag = true;    // Boolean assignment
+```
+
+#### Arithmetic Operations
+
+```c
+result = a + b;  // Addition
+result = a - b;  // Subtraction
+result = a * b;  // Multiplication (limited to small numbers)
+```
+
+#### Conditional Statements
+
+```c
+if (x > 0) {
+    y = 1;
+} else {
+    y = 0;
+}
+
+// Nested conditionals
+if (a > b) {
+    if (c > 0) {
+        result = a + c;
+    }
+}
+```
+
+#### While Loops
+
+```c
+while (i < 10) {
+    sum = sum + i;
+    i = i + 1;
+}
+```
+
+#### Comparison Operators
+
+- `==` (equals)
+- `!=` (not equals)
+- `<` (less than)
+- `>` (greater than)
+- `<=` (less than or equal)
+- `>=` (greater than or equal)
+
+#### Boolean Operators
+
+- `&&` (and)
+- `||` (or)
+- `!` (not)
+
+#### Program Termination
+
+```c
+halt;  // End program execution
+```
+
+### Compiler Usage
+
+```bash
+# Compile a Johnny C program
+bun run compile <filename.jcc>
+
+# This generates a .ram file that can be simulated
+bun run simulate <filename.ram>
+```
+
+### Example Programs
+
+See the `jcc/` directory for example programs:
+
+- `simple_add.jcc` - Basic arithmetic
+- `variables.jcc` - Variable declarations and assignments
+- `if_else.jcc` - Conditional statements
+- `countdown.jcc` - While loop with countdown
+- `comparisons.jcc` - All comparison operators (==, !=, <, >, <=, >=)
+- `expressions.jcc` - Complex expressions
+- `nested_if.jcc` - Nested conditional statements
+- `factorial.jcc` - Iterative accumulation
+- `demo.jcc` - Mixed arithmetic and boolean operations
+- `showcase.jcc` - Comprehensive language feature demonstration
+
+### Recent Improvements
+
+✅ **Full Comparison Support**: All comparison operators now implemented
+✅ **Boolean Literals**: `true` and `false` keywords supported
+✅ **Enhanced Examples**: 10+ example programs covering all language features
+✅ **Comprehensive Testing**: Automated test script for all examples
+
+### Limitations
+
+- Constants must be small integers (≤10) for optimal performance
+- Multiplication uses repeated addition algorithm
+- No functions or procedures yet
+- Limited to integer and boolean types
 
 ## 📊 Program Summary
 

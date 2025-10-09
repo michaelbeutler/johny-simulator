@@ -111,6 +111,16 @@ export class NumberLiteral extends Expression {
   }
 }
 
+export class BooleanLiteral extends Expression {
+  constructor(
+    public value: boolean,
+    line: number,
+    column: number
+  ) {
+    super(line, column);
+  }
+}
+
 export class Identifier extends Expression {
   constructor(
     public name: string,
@@ -492,6 +502,16 @@ export class Parser {
     if (this.match(TokenType.IDENTIFIER)) {
       const token = this.previous();
       return new Identifier(token.value, token.line, token.column);
+    }
+
+    if (this.match(TokenType.TRUE)) {
+      const token = this.previous();
+      return new BooleanLiteral(true, token.line, token.column);
+    }
+
+    if (this.match(TokenType.FALSE)) {
+      const token = this.previous();
+      return new BooleanLiteral(false, token.line, token.column);
     }
 
     if (this.match(TokenType.LEFT_PAREN)) {
